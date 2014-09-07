@@ -71,7 +71,7 @@ After picking your subject matter, create a copy of the base file with the name 
 $ cd /home/user/path/to/workarea/
 $ cp skeleton-canvas.html tutorials/your-subject-matter.html
 ```
-Now open tutorials/your-subject-matter.html in your favorite text editor like notepad++ or brackets and place your code in the highlighted area labeled: 
+Now open ```tutorials/your-subject-matter.html``` in your favorite text editor like notepad++ or vim and place your code in the highlighted area labeled: 
 ```
 \\do Webgl stuff here...
 ```

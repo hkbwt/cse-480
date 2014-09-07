@@ -71,9 +71,9 @@ After picking your subject matter, create a copy of the base file with the name 
 $ cd /home/user/path/to/workarea/
 $ cp skeleton-canvas.html tutorials/your-subject-matter.html
 ```
-Now open tutorials/your-subject-matter.html in your favorite text editor like notepad++ or brackets and place your code in the highlighted area labeled "
+Now open tutorials/your-subject-matter.html in your favorite text editor like notepad++ or brackets and place your code in the highlighted area labeled: 
 ```
-\\do Webgl stuff here..."
+\\do Webgl stuff here...
 ```
 All dependencies should be taken care of. The skeleton file uses css from the ```css/lean.css``` file and javascript libraries located in the ```libs/``` directory. it uses the debug version of three.js, jquery, stats and dat.gui libraries located in ```libs/```. 
 

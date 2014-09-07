@@ -4,14 +4,14 @@ cse-480
 The goal of this project is to visualize common computer science ideas, structures and theories in Webgl using three.js. Our development browser will be chrome, as it is the furthest along in implementing Webgl. Webgl provides the Opengl library in JavaScript. Webgl is used to render 3d hardware accelerated graphics in the web browser. Three.js is a high-level wrapper library to encapsulate the Webgl library; as well as implementing helper libraries.
 
 Further_reading
-http://www.khronos.org/webgl/wiki/Main_Page
-http://www.opengl.org/wiki/Main_Page
-http://threejs.org/
+*http://www.khronos.org/webgl/wiki/Main_Page
+*http://www.opengl.org/wiki/Main_Page
+*http://threejs.org/
 
 Getting Started
 ===============
 The first thing to do is to download git. if you're using windows download git here:
-http://msysgit.github.io/
+*http://msysgit.github.io/
 
 or if you're using linux download git from the official repositories in you're preferred distribution.
 an example for arch linux
@@ -58,8 +58,8 @@ NOTE: It should ask you for your username and password for github.
 Congratulations, you have successfully contributed to the project!
 
 Further_reading
-http://gitimmersion.com/lab_01.html
-http://gitref.org/
+*http://gitimmersion.com/lab_01.html
+*http://gitref.org/
 
 Basic Project Outline
 =====================
@@ -75,9 +75,9 @@ Three.js Primer
 An example file can be found in the tutorials folder. In it you can see how to do the basics of rendering and updating the screen and using the stats and the gui libraries. I have also compiled a list of tutorials and books and real code for you to look at.
 
 Further_reading
-https://www.youtube.com/channel/UCQakTdADmS_hLgGw6afzFNg
-https://github.com/josdirksen/learning-threejs
-https://drive.google.com/file/d/0B1D_AELyf6cGOWxTcFhNU2lLczg/edit?usp=sharing
+*https://www.youtube.com/channel/UCQakTdADmS_hLgGw6afzFNg
+*https://github.com/josdirksen/learning-threejs
+*https://drive.google.com/file/d/0B1D_AELyf6cGOWxTcFhNU2lLczg/edit?usp=sharing
 
 
 Computer Science Subject

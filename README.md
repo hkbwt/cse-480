@@ -1,7 +1,7 @@
 cse-480
 =======
 
-The goal of this project is to visualize common computer science ideas, structures and theories in Webgl using three.js. Our development browser will be chrome, as it is the furthest along in implementing Webgl. Webgl provides the Opengl library in JavaScript. Webgl is used to render 3d hardware accelerated graphics in the web browser. Three.js is a high-level wrapper library to encapsulate the Webgl library; as well as implementing helper libraries.
+The goal of this project is to visualize common computer science ideas, structures and theories in Webgl using three.js. Our development browser will be chrome, as it is the furthest along in implementing Webgl. Webgl provides the Opengl library in JavaScript. Opengl is used to render hardware accelerated 2d and 3d graphics; Webgl provides this in a web browser. Three.js is a high-level wrapper library to encapsulate the Webgl library; as well as implementing helper libraries for easier coding.
 
 Further_reading
 * http://www.khronos.org/webgl/wiki/Main_Page
@@ -40,11 +40,13 @@ $ git config --global core.autocrlf false
 
 Now that git is setup, the next thing to do is to setup your work area and download the project from github. First navigate to your desired directory. Then clone the repository
 ```
+$ cd /home/user/path/to/workarea/
 $ git clone https://github.com/lakkthereof/cse-480.git
 ```
 
 now navigate to the cse-480 folder and create your own branch to work on
 ```
+$ cd /home/user/path/to/workarea/cse-480/
 $ git checkout -b your_name
 ```
 Now you are ready to code. Once finished and you want to push your changes to the remote repository you will need to do the following:
@@ -53,7 +55,8 @@ $ git add .
 $ git commit -m "what did I do in this commit"
 $ git push origin your_name
 ```
-NOTE: It should ask you for your username and password for github.
+* NOTE: It should ask you for your username and password for github.
+* NOTE: Currently there is no need to setup a webserver to process these pages. However, if other assets are add this could be needed. 
 
 Congratulations, you have successfully contributed to the project!
 
@@ -65,10 +68,18 @@ Basic Project Outline
 =====================
 After picking your subject matter, create a copy of the base file with the name of your subject in the tutorials directory 
 ```
+$ cd /home/user/path/to/workarea/
 $ cp skeleton-canvas.html tutorials/your-subject-matter.html
 ```
-Now open tutorials/your-subject-matter.html in your favorite text editor like notepad++ or brackets and place your code in the highlighted area labeled do Webgl stuff here...
-All dependencies should be taken care of. The skeleton file uses css from the css/lean.css file. it also uses the debug version of three.js, jquery, stats and dat.gui libraries. If you are having performance issues on older hardware I would suggest using the "min" versions of these files. They can also be found in the libs folder. Some extra css files are add in case they are needed. but currently they are not used in the skeleton file.
+Now open tutorials/your-subject-matter.html in your favorite text editor like notepad++ or brackets and place your code in the highlighted area labeled "
+```
+\\do Webgl stuff here..."
+```
+All dependencies should be taken care of. The skeleton file uses css from the ```css/lean.css``` file and javascript libraries located in the ```libs/``` directory. it uses the debug version of three.js, jquery, stats and dat.gui libraries located in ```libs/```. 
+
+If you are having performance issues on older hardware I would suggest using the "min" versions of these files. They can also be found in the ```libs/``` folder. 
+
+* NOTE: Some extra css files are add in case they are needed. but currently they are not used in the skeleton file.
 
 Three.js Primer
 ===============

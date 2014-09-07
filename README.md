@@ -78,7 +78,7 @@ Further_reading
 * https://www.youtube.com/channel/UCQakTdADmS_hLgGw6afzFNg
 * https://github.com/josdirksen/learning-threejs
 * https://drive.google.com/file/d/0B1D_AELyf6cGOWxTcFhNU2lLczg/edit?usp=sharing
-
+* http://threejs.org/docs/#Manual/Introduction/Creating_a_scene
 
 Computer Science Subject
 ========================

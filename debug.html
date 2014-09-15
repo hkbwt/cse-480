@@ -24,9 +24,18 @@
             
             //document.write(g.printGraph() );
 
-            var e = new Engine();
+            var e = new ENGINE.engine();
             e.addAxes();
+            
+            e.camera.position.x = -30;
+            e.camera.position.y = 40;
+            e.camera.position.z = 30;
+            e.camera.lookAt(e.scene.position);
+
+
             e.render();
+
+
 
 
   

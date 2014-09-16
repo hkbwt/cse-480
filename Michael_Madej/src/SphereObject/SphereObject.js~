@@ -1,0 +1,9 @@
+//needs a webgl scene as a constructor
+ 
+SphereObject = function(scene){
+	var scene;
+	this.scene = scene;
+	
+}
+
+SphereObject.prototype = new NodeObject();

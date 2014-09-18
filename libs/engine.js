@@ -33,27 +33,36 @@ engine: function() {
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setClearColorHex(0xEEEEEE, 1.0);
 			renderer.setSize(window.innerWidth, window.innerHeight);
-			//renderer.shadowMapEnabled = true;
+			renderer.shadowMapEnabled = true;
 
 			$("#WebGL-output").append(renderer.domElement);
 			return renderer;
 		}
 
+		function createAmbientLight() {
+			return new THREE.AmbientLight(0x0c0c0c);
+		}
+
+
 		this.stats = initStats();
+
 		this.scene = createScene();
 		this.camera = createCamera();
 		this.renderer = createRenderer();
+		this.ambientLight = createAmbientLight();
 
 
 		this.render = ENGINE.render;
 		this.addAxes = ENGINE.addAxes;
 
+		this.scene.add(this.ambientLight);
+
 	},
 
 
-	render: function(){
-
+	render: function() {
 		this.stats.update();
+		window.requestAnimationFrame(this.render.bind(this));
 	    this.renderer.render(this.scene, this.camera);
 
 	},
@@ -62,6 +71,8 @@ engine: function() {
 		var axes = new THREE.AxisHelper(20);
 		this.scene.add(axes);
 	}
+
+
 
 
 }

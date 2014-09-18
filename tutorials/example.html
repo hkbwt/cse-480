@@ -2,10 +2,10 @@
 <html>
   <head>
     <title> Example tutorial </title>
-    <script type="text/javascript" src="../libs/vendor/three.js"></script>
-    <script type="text/javascript" src="../libs/vendor/jquery-2.1.1.js"></script>
-    <script type="text/javascript" src="../libs/vendor/Stats.js"></script>
-    <script type="text/javascript" src="../libs/vendor/DAT.GUI.js"></script>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="../libs/Stats.js"></script>
+    <script type="text/javascript" src="../libs/DAT.GUI.js"></script>
 	
     <link rel="stylesheet" type="text/css" href="../../css/lean.css">
   </head>
@@ -73,10 +73,10 @@
         scene.add(ambientLight);
 
         // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( -40, 60, -10 );
-        spotLight.castShadow = true;
-        scene.add( spotLight );
+        //var spotLight = new THREE.SpotLight( 0xffffff );
+        //spotLight.position.set( -40, 60, -10 );
+        //spotLight.castShadow = true;
+        //scene.add( spotLight );
 
         // add the output of the renderer to the html element
         $("#WebGL-output").append(renderer.domElement);

@@ -26,26 +26,36 @@
             
             // document.write(g.printGraph() );
 
+            //initialize engine
             var e = new Engine("#WebGL-output");
             e.addAxes();
-            
-            e.camera.position.x = -30;
-            e.camera.position.y = 40;
-            e.camera.position.z = 30;
+
+            //initialize camera
+            e.camera.position.set(-30,40,30);            
             e.camera.lookAt(e.scene.position);
 
+            //create test shapes
+            var sp = FACTORIES.createSphere(3);
+            sp.position.set(8,4,0);
 
-            var c = FACTORIES.createSphere(3, {x: 8,y: 4,z: 0});
-            var sl = FACTORIES.createSpotLight(0, 0);
-            var pl = FACTORIES.createPlane();
+            var box = FACTORIES.createBox(5,5,5);
+            box.position.set(10,15,-5);
 
+            var pl = FACTORIES.createPlane({x: 65, y: 21});
+            pl.position.set(10,-4,0);
+            pl.rotation.x=-0.5*Math.PI;
 
+            //create light
+            var sl = FACTORIES.createSpotLight({x: -40,y: 60,z: -10});
 
+            //add object to scene
+            e.scene.add(box);
             e.scene.add(pl);
-            e.scene.add(c);
+            e.scene.add(sp);
             e.scene.add(sl);
 
 
+            //render loop
             e.render();
 
 

@@ -32,32 +32,41 @@
             e.addAxes();
 
             //initialize camera
-            e.camera.position.set(-30,40,30);            
+            e.camera.position.set(55,40,-30);            
             e.camera.lookAt(e.scene.position);
 
             //create test material
             var redmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.purple);
-            var plmat = Factories.Materials.createLambertMaterial();
+            var plmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.white);
 
             //create test shapes
             var sp = Factories.Shapes.createSphere(3, redmat);
-            sp.position.set(8,4,0);
+            sp.position.set(8,4,5);
 
             var box = Factories.Shapes.createBox(5,5,5, redmat);
-            box.position.set(10,15,-5);
+            box.position.set(-20,4,0);
 
-            var pl = Factories.Shapes.createPlane({x: 65, y: 21}, plmat);
-            pl.position.set(10,-4,0);
-            pl.rotation.x=-0.5*Math.PI;
+            var pl = Factories.Shapes.createPlane({x: 75, y: 50}, plmat);
+            pl.position.set(0,-1,0);
+
+            var cly = Factories.Shapes.createCylinder(1,1,30, redmat);
+            cly.position.set( 0, 0, 0);
+            pl.rotation.x +=   -0.5 * Math.PI;
+
+            var points = [box.position, sp.position];
+            var tube = Factories.Shapes.createTube(points, 32, 0.25, 8, false, redmat);
+
 
             //create light
             var sl = Factories.Lights.createSpotLight({x: -40,y: 60,z: -10});
 
             //add object to scene
+            e.scene.add(cly);
             e.scene.add(box);
             e.scene.add(pl);
             e.scene.add(sp);
             e.scene.add(sl);
+            e.scene.add(tube);
 
 
             //render loop

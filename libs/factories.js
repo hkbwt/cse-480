@@ -53,9 +53,7 @@ var Factories = {
 		createLambertMaterial: function(hexColor) {
 			hexColor = ( hexColor != undefined ) ? hexColor : 0xffffff;
 			return new THREE.MeshLambertMaterial({color: hexColor});
-
-
 		}
 	}
 
-}
+};

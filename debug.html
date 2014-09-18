@@ -9,6 +9,7 @@
     <script type="text/javascript" src="./libs/Stats.js"></script>
     <script type="text/javascript" src="./libs/DAT.GUI.js"></script>
     <script type="text/javascript" src="./libs/factories.js"></script>
+    <script type="text/javascript" src="./libs/detector.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/lean.css">
     </head>
 
@@ -25,7 +26,7 @@
             
             // document.write(g.printGraph() );
 
-            var e = new ENGINE.engine();
+            var e = new Engine("#WebGL-output");
             e.addAxes();
             
             e.camera.position.x = -30;

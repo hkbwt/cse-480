@@ -16,4 +16,6 @@ var Palettes = {
 		purple: 0xc900ff,
 		white: 0xfbfaf4
 	}
+
+	//add more
 };

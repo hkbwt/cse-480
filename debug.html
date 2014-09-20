@@ -28,35 +28,35 @@
             console.log(g.printGraph() );
 
             //initialize engine
-            var e = new Engine("#WebGL-output");
+            var e = new Engine("#WebGL-output", true, 0x000000, 1.0);
             e.addAxes();
-
+            
             //initialize camera position
             e.camera.position.set(66,135, 0);            
             e.camera.lookAt(e.scene.position);
 
             //create test material
-            var redmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.green);
+            var mat = Factories.Materials.createLambertMaterial(Palettes.Halloween.green);
             var plmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.white);
 
             //create test shapes
-            var sp = Factories.Shapes.createSphere(3, redmat);
+            var sp = Factories.Shapes.createSphere(3, mat);
             sp.position.set(8,4,5);
 
-            var box = Factories.Shapes.createBox(5,5,5, redmat);
+            var box = Factories.Shapes.createBox(5,5,5, mat);
             box.position.set(-20,4,0);
 
             var pl = Factories.Shapes.createPlane({x: 100, y: 100}, plmat);
             pl.position.set(0,-1,0);
-            pl.rotation.x +=   -0.5 * Math.PI;
+            pl.rotation.x += -0.5 * Math.PI;
 
 
-            var cly = Factories.Shapes.createCylinder(1,1,30, redmat);
+            var cly = Factories.Shapes.createCylinder(1,1,30, mat);
             cly.position.set( 0, 0, 0);
             
 
             var points = [box.position, sp.position];
-            var tube = Factories.Shapes.createTube(points, 32, 0.25, 8, false, redmat);
+            var tube = Factories.Shapes.createTube(points, 32, 0.25, 8, false, mat);
 
 
             //create light

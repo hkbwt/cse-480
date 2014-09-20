@@ -9,6 +9,8 @@
 *
 *********************************************************/
 
+/*Class used for manipulating the graph data structure*/
+
 function Graph(v) {
     this.vertices = v;
     this.edges = 0;
@@ -42,4 +44,4 @@ Graph.prototype =  {
     }
         return msg;
     }
-}
+};

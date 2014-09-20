@@ -51,6 +51,8 @@ var Factories = {
 
             return tube;
         }
+
+        //add more shapes
     },
 
     Lights: {
@@ -64,6 +66,8 @@ var Factories = {
             return spotLight;
         }
 
+        //add more lights or light sources
+
     },
 
     Materials: {
@@ -71,6 +75,8 @@ var Factories = {
             hexColor = ( hexColor != undefined ) ? hexColor : 0xffffff;
             return new THREE.MeshLambertMaterial({color: hexColor});
         }
+
+        //add different material or custom shader
     }
 
 };

@@ -9,7 +9,7 @@
 *
 *********************************************************/
 
-function Engine(domElement, bRenderStats) {
+function Engine(domElement, bRenderStats, worldcolor, fogdensity) {
 
 		this.stats = undefined;
 		this.scene = undefined;
@@ -18,6 +18,8 @@ function Engine(domElement, bRenderStats) {
 		this.ambientLight = undefined;
 		this.bStats = ( bRenderStats != undefined ) ? bRenderStats : true;
 		this.domElement = domElement;
+		this.worldcolor = (worldcolor != undefined) ? worldcolor : 0xEEEEEE;
+		this.alpha = (fogdensity != undefined) ? fogdensity : 1.0;
 
 		this.init();
 }
@@ -63,7 +65,8 @@ Engine.prototype.createCamera = function() {
 
 Engine.prototype.createRenderer = function() {
 	var renderer = new THREE.WebGLRenderer();
-	renderer.setClearColorHex(0xEEEEEE, 1.0);
+	renderer.setClearColor(this.worldcolor, this.alpha);
+	//renderer.setClearColorHex(0xEEEEEE, 1.0);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMapEnabled = true;
 

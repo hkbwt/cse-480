@@ -11,6 +11,7 @@
     <script type="text/javascript" src="./libs/factories.js"></script>
     <script type="text/javascript" src="./libs/detector.js"></script>
     <script type="text/javascript" src="./libs/palettes.js"></script>
+    <script type="text/javascript" src="./libs/models.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/lean.css">
     </head>
 
@@ -19,12 +20,16 @@
     <div id="WebGL-output"> </div>
 	
         <script type="text/javascript">
-            var g = new Graph(5);
+            var g = new Graph(25);
             g.addEdge(0,1);
             g.addEdge(0,2);
             g.addEdge(1,3);
             g.addEdge(2,4);
-            
+            g.addEdge(13,5);
+            g.addEdge(24, 3);
+            g.addEdge(14,1);
+            g.addEdge(10,22);
+
             console.log(g.printGraph() );
 
             //initialize engine
@@ -32,52 +37,64 @@
             e.addAxes();
             
             //initialize camera position
-            e.camera.position.set(66,135, 0);            
+            e.camera.position.set(0, -200, 150);            
             e.camera.lookAt(e.scene.position);
-
-            //create test material
+            
+            
+          //create test material
             var mat = Factories.Materials.createLambertMaterial(Palettes.Halloween.green);
             var plmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.white);
 
+            //create light
+            var sl = Factories.Lights.createSpotLight({x: 0,y: 0,z: 325});
+
+            var pl = Factories.Shapes.createPlane({x: 200, y: 200}, plmat);
+            pl.position.set(0,0,-1);
+            //pl.rotation.x += -0.5 * Math.PI;
+
+
+            var gmodel = new GraphModel(g, undefined, {nodeColor: Palettes.Halloween.green, linkColor: Palettes.Halloween.purple} );
+
+
+
+
             //create test shapes
-            var sp = Factories.Shapes.createSphere(3, mat);
-            sp.position.set(8,4,5);
+            // var sp = Factories.Shapes.createSphere(3, mat);
+            // sp.position.set(8,4,5);
 
-            var box = Factories.Shapes.createBox(5,5,5, mat);
-            box.position.set(-20,4,0);
-
-            var pl = Factories.Shapes.createPlane({x: 100, y: 100}, plmat);
-            pl.position.set(0,-1,0);
-            pl.rotation.x += -0.5 * Math.PI;
+            // var box = Factories.Shapes.createBox(5,5,5, mat);
+            // box.position.set(-20,4,0);
 
 
-            var cly = Factories.Shapes.createCylinder(1,1,30, mat);
-            cly.position.set( 0, 0, 0);
+
+            // var cly = Factories.Shapes.createCylinder(1,1,30, mat);
+            // cly.position.set( 10, 10, 0);
             
 
-            var points = [box.position, sp.position];
-            var tube = Factories.Shapes.createTube(points, 32, 0.25, 8, false, mat);
+            // var points = [box.position, sp.position];
+            // var tube = Factories.Shapes.createTube(points, 32, 0.25, 8, false, mat);
 
 
-            //create light
-            var sl = Factories.Lights.createSpotLight({x: -40,y: 150,z: -10});
 
             //add object to scene
-            //e.scene.add(cly);
-            e.scene.add(box);
             e.scene.add(pl);
-            e.scene.add(sp);
             e.scene.add(sl);
-            e.scene.add(tube);
 
+            for(var i = 0; i < gmodel.nodeList.length; i++) {
+                e.scene.add(gmodel.nodeList[i].mesh);    
+            }
+
+            for(var i = 0; i < gmodel.edgeList.length; i++) {
+                e.scene.add(gmodel.edgeList[i].mesh);    
+            }
+
+            //e.scene.add(box);
+            //e.scene.add(sp);
+            //e.scene.add(cly);
+            //e.scene.add(tube);
 
             //render loop
             e.render();
-
-
-
-
-  
   
         </script>
     </body>

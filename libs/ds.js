@@ -26,6 +26,7 @@ Graph.prototype =  {
     addEdge: function(v,w) {
     this.adj[v].push(w);
     this.adj[w].push(v);
+    this.edges++;
     },
 
     printGraph: function() {

@@ -9,7 +9,7 @@
 *
 *********************************************************/
 
-function Engine(domElement, bRenderStats, worldcolor, fogdensity) {
+function Engine(domElement, bRenderStats, worldcolor, fogdensity, bDebug) {
 
 		this.stats = undefined;
 		this.scene = undefined;
@@ -21,6 +21,10 @@ function Engine(domElement, bRenderStats, worldcolor, fogdensity) {
 		this.worldcolor = (worldcolor != undefined) ? worldcolor : 0xEEEEEE;
 		this.alpha = (fogdensity != undefined) ? fogdensity : 1.0;
 
+		this.cameraControls = undefined;
+		this.clock = undefined;
+		this.bDebug = bDebug;
+
 		this.init();
 }
 
@@ -31,18 +35,59 @@ Engine.prototype.init = function() {
 			this.stats = this.initStats();
 		}
 
-		this.scene = this.createScene();
 		this.camera = this.createCamera();
-		this.renderer = this.createRenderer();
-		this.ambientLight = this.createAmbientLight();
+		this.scene = this.createScene();
+		this.clock = this.createClock();
 
+		this.ambientLight = this.createAmbientLight();
 		this.scene.add(this.ambientLight);
+
+		this.renderer = this.createRenderer();
+		// window.addEventListener('resize', this.onWindowResize, false);
+
+		//debug engine
+		if (this.bDebug) {
+			console.log(this.scene);
+			console.log(this.camera);
+			console.log(this.renderer);
+			console.log(this.cameraControls);
+			console.log(this.bStats);
+			console.log(this.domElement);
+			console.log(this.worldcolor);
+			console.log(this.alpha);
+		}
+
 	}
 	else {
 		Detector.addGetWebGLMessage();
 	}
 }
 
+
+ Engine.prototype.render = function() {
+ 	if(this.bStats) {
+ 		this.stats.update();
+ 	}
+
+ 	//console.log(this);
+ 	window.requestAnimationFrame(this.render.bind(this));
+
+ 	var delta = this.clock.getDelta();
+
+	// this.cameraControls.update();	
+    this.renderer.render(this.scene, this.camera); 
+}
+
+Engine.prototype.createOrbitControls = function() {
+	var cameraControls = new THREE.OrbitControls( this.camera );
+	cameraControls.damping = 0.2;
+	cameraControls.addEventListener( 'change', this.render );
+	return cameraControls;
+}
+
+Engine.prototype.createClock = function() {
+	return new THREE.Clock();
+}
 
 Engine.prototype.initStats = function() {
 	if(this.bStats == false){
@@ -64,13 +109,13 @@ Engine.prototype.createCamera = function() {
 }
 
 Engine.prototype.createRenderer = function() {
-	var renderer = new THREE.WebGLRenderer();
+	var renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setClearColor(this.worldcolor, this.alpha);
-	//renderer.setClearColorHex(0xEEEEEE, 1.0);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMapEnabled = true;
 
 	$(this.domElement).append(renderer.domElement);
+
 	return renderer;
 }
 
@@ -78,18 +123,17 @@ Engine.prototype.createAmbientLight =  function() {
 	return new THREE.AmbientLight(0x0c0c0c);
 }
 
-
- Engine.prototype.render = function() {
- 	if(this.bStats) {
- 		this.stats.update();
- 	}
-	
-	window.requestAnimationFrame(this.render.bind(this));
-    this.renderer.render(this.scene, this.camera);
-
-}
-
 Engine.prototype.addAxes = function() {
 	var axes = new THREE.AxisHelper(20);
 	this.scene.add(axes);
 }
+/*
+Engine.prototype.onWindowResize = function() {
+
+	this.camera.aspect = window.innerWidth / window.innerHeight;
+	this.camera.updateProjectionMatrix();
+	this.renderer.setSize( window.innerWidth, window.innerHeight );
+	this.render();
+
+}
+*/

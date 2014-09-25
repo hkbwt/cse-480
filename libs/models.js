@@ -72,7 +72,7 @@ GraphModel.prototype.createNodes = function() {
 		}
 	}
 
-	console.log(this.nodeList);
+	//console.log(this.nodeList);
 
 }
 
@@ -106,7 +106,7 @@ GraphModel.prototype.positionNodes = function() {
 		}
 		else {
 			theta += dtheta;
-		}
+		}  
 
 	}
 }
@@ -141,7 +141,6 @@ GraphModel.prototype.createEdgeModels = function() {
 		
 
 }
-
 
 GraphModel.prototype.getCircleCoords = function(radius, theta){
 	return {x: radius * Math.cos(theta) , y: radius * Math.sin(theta)};

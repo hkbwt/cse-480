@@ -27,7 +27,7 @@ var Factories = {
         },
 
         createPlane: function(rect, material) {
-            var planeGeo = new THREE.PlaneGeometry(rect.x, rect.y);
+            var planeGeo = new THREE.PlaneGeometry(rect.x, rect.y,10,10);
             var plane = new THREE.Mesh(planeGeo, material);
             plane.receiveShadow  = true;
 
@@ -57,13 +57,22 @@ var Factories = {
 
     Lights: {
 
-        createSpotLight: function(pos, hexColor) {
+        createSpotLight: function(pos, hexColor, intensity) {
             hexColor = ( hexColor != undefined ) ? hexColor : 0xffffff;
-            var spotLight = new THREE.SpotLight(hexColor);
+            intensity = ( intensity != undefined ) ? intensity : 1.0;
+            var spotLight = new THREE.SpotLight(hexColor, intensity);
             spotLight.position.set( pos.x, pos.y, pos.z);
             spotLight.castShadow = true;
             
             return spotLight;
+        },
+
+        createDirectionalLight: function(direction, hexColor, intensity) {
+            hexColor = ( hexColor != undefined ) ? hexColor : 0xffffff;
+            intensity = ( intensity != undefined ) ? intensity : 1.0;
+            var directionalLight = new THREE.DirectionalLight( hexColor, intensity);
+            directionalLight.position.set( direction.x, direction.y, direction.z );
+            return directionalLight;
         }
 
         //add more lights or light sources

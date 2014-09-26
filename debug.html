@@ -48,14 +48,16 @@
             var plmat = Factories.Materials.createLambertMaterial(Palettes.Halloween.white);
 
             //create light
-            var sl = Factories.Lights.createSpotLight({x: 0,y: 0,z: 325});
+            var sl = Factories.Lights.createSpotLight({x: 200,y: 44,z: 200}, Palettes.Halloween.white, 0.75);
+            var dirl = Factories.Lights.createDirectionalLight(new THREE.Vector3(0,0,1), Palettes.Halloween.white, 0.5)
+
 
             var pl = Factories.Shapes.createPlane({x: 200, y: 200}, plmat);
             pl.position.set(0,0,-1);
             //pl.rotation.x += -0.5 * Math.PI;
 
 
-            var gmodel = new GraphModel(g, undefined, {nodeColor: Palettes.Halloween.green, linkColor: Palettes.Halloween.purple} );
+            var gmodel = new GraphModel(g, undefined, {nodeColor: Palettes.Halloween.purple, linkColor: Palettes.Halloween.black} );
 
 
 
@@ -64,8 +66,8 @@
             // var sp = Factories.Shapes.createSphere(3, mat);
             // sp.position.set(8,4,5);
 
-            // var box = Factories.Shapes.createBox(5,5,5, mat);
-            // box.position.set(-20,4,0);
+            var box = Factories.Shapes.createBox(5,5,55, mat);
+            box.position.set(0,0,35);
 
 
 
@@ -81,6 +83,7 @@
             //add object to scene
             e.scene.add(pl);
             e.scene.add(sl);
+            e.scene.add(dirl);
 
             for(var i = 0; i < gmodel.nodeList.length; i++) {
                 e.scene.add(gmodel.nodeList[i].mesh);    
@@ -90,7 +93,7 @@
                 e.scene.add(gmodel.edgeList[i].mesh);    
             }
 
-            //e.scene.add(box);
+            e.scene.add(box);
             //e.scene.add(sp);
             //e.scene.add(cly);
             //e.scene.add(tube);

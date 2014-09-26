@@ -98,7 +98,7 @@ GraphModel.prototype.positionNodes = function() {
 
 	for(var node = 0; node < this.nodeList.length; node++) {
 		var coord = this.getCircleCoords(radius, theta);
-		this.nodeList[node].mesh.position.set(coord.x, coord.y, 5or);
+		this.nodeList[node].mesh.position.set(coord.x, coord.y, 10);
 
 		nodeCount++;
 
@@ -186,6 +186,6 @@ SortingModel.prototype.init = function() {
 
 }
 
-SortingModel.prototype.positionBars = function() {
+/*SortingModel.prototype.positionBars = function() {
 	
-}
+}*/

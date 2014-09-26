@@ -32,14 +32,20 @@ function edgeObj(mesh, v, w, state) {
 	return this;
 }
 
+function barObj(mesh, value, state) {
+	this.mesh = mesh;
+	this.value = value;
+	this.state = state;
+}
 
-function materials(mat, name) {
+
+/*function materials(mat, name) {
 	this.mat = mat;
 	this.name = name;
 
 	return this;
 }
-
+*/
 
 function GraphModel (graph, lables, colors) {
 	this.graph = graph;
@@ -92,7 +98,7 @@ GraphModel.prototype.positionNodes = function() {
 
 	for(var node = 0; node < this.nodeList.length; node++) {
 		var coord = this.getCircleCoords(radius, theta);
-		this.nodeList[node].mesh.position.set(coord.x, coord.y, 10);
+		this.nodeList[node].mesh.position.set(coord.x, coord.y, 5or);
 
 		nodeCount++;
 
@@ -146,3 +152,40 @@ GraphModel.prototype.getCircleCoords = function(radius, theta){
 	return {x: radius * Math.cos(theta) , y: radius * Math.sin(theta)};
 }
 
+/*Sorting Model
+	
+*/
+
+function SortingModel(data, colorsList, rect, axis, offset) {
+	this.data = data;
+	this.colorList = colorList;
+
+	this.width = rect.x;
+	this.height = rect.y;
+	//this.barCount = data.length;
+	this.spaceMulti = 2;
+	this.headPos = new THREE.Vector3(0, 0, 0);
+
+
+	this.barObjList = [];
+	this.materials = {};
+
+	this.init();
+}
+
+SortingModel.prototype.init = function() {
+
+	this.materials.nodeMat = Factories.Materials.createLambertMaterial(this.colorList.selected);
+	this.materials.linkMat = Factories.Materials.createLambertMaterial(this.colorList.unselected);
+
+	for(var i = 0; i < this.data.length; i++) {
+		var bar = Factories.Shapes.createBox(10, 5 * this.data[i].value, 10, this.materials.unselected);
+		this.barObjList.push(new barObj(bar,this.data[i].value, 'unselected'));
+	}
+
+
+}
+
+SortingModel.prototype.positionBars = function() {
+	
+}

@@ -60,14 +60,17 @@
             var gmodel = new GraphModel(g, undefined, {nodeColor: Palettes.Halloween.purple, linkColor: Palettes.Halloween.black} );
 
 
+            var smodel = new SortingModel([1, 5, 10, 2, 9, 7, 13], {selected: Palettes.Halloween.orange, unselected: Palettes.Halloween.green }, {x: 10, y: 10}, -1);
+
+
 
 
             //create test shapes
             // var sp = Factories.Shapes.createSphere(3, mat);
             // sp.position.set(8,4,5);
 
-            var box = Factories.Shapes.createBox(5,5,55, mat);
-            box.position.set(0,0,35);
+            // var box = Factories.Shapes.createBox(5,5,55, mat);
+            // box.position.set(0,0,35);
 
 
 
@@ -85,15 +88,20 @@
             e.scene.add(sl);
             e.scene.add(dirl);
 
-            for(var i = 0; i < gmodel.nodeList.length; i++) {
+/*            for(var i = 0; i < gmodel.nodeList.length; i++) {
                 e.scene.add(gmodel.nodeList[i].mesh);    
             }
 
             for(var i = 0; i < gmodel.edgeList.length; i++) {
                 e.scene.add(gmodel.edgeList[i].mesh);    
+            }*/
+
+
+            for(var i = 0; i < smodel.barObjList.length; i++) {
+                e.scene.add(smodel.barObjList[i].mesh);    
             }
 
-            e.scene.add(box);
+            // e.scene.add(box);
             //e.scene.add(sp);
             //e.scene.add(cly);
             //e.scene.add(tube);

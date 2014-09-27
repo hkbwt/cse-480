@@ -32,8 +32,9 @@ function edgeObj(mesh, v, w, state) {
 	return this;
 }
 
-function barObj(mesh, value, state) {
+function barObj(mesh, height, value, state) {
 	this.mesh = mesh;
+	this.height = height;
 	this.value = value;
 	this.state = state;
 }
@@ -156,16 +157,23 @@ GraphModel.prototype.getCircleCoords = function(radius, theta){
 	
 */
 
-function SortingModel(data, colorsList, rect, axis, offset) {
-	this.data = data;
-	this.colorList = colorList;
+/* this class assumes up is in the positive Z axis and that the array of positions the bars
+fill is located somwhere on the x-y plane */
 
-	this.width = rect.x;
-	this.height = rect.y;
+function SortingModel(data, colorsList, rect, boardheight) {
+	this.data = data;
+	this.colorsList = colorsList;
+
+	// width and depth
+	this.baseX = rect.x;
+	this.baseY = rect.y;
+	this.boardZHeight = boardheight;
+	this.padding = 5;
+	this.heightStep = 5;
+
 	//this.barCount = data.length;
 	this.spaceMulti = 2;
-	this.headPos = new THREE.Vector3(0, 0, 0);
-
+	this.boardheight = boardheight;
 
 	this.barObjList = [];
 	this.materials = {};
@@ -175,17 +183,41 @@ function SortingModel(data, colorsList, rect, axis, offset) {
 
 SortingModel.prototype.init = function() {
 
-	this.materials.nodeMat = Factories.Materials.createLambertMaterial(this.colorList.selected);
-	this.materials.linkMat = Factories.Materials.createLambertMaterial(this.colorList.unselected);
+	this.materials.selected = Factories.Materials.createLambertMaterial(this.colorsList.selected);
+	this.materials.unselected = Factories.Materials.createLambertMaterial(this.colorsList.unselected);
 
 	for(var i = 0; i < this.data.length; i++) {
-		var bar = Factories.Shapes.createBox(10, 5 * this.data[i].value, 10, this.materials.unselected);
-		this.barObjList.push(new barObj(bar,this.data[i].value, 'unselected'));
+		var barHeight = this.heightStep * this.data[i];
+		var bar = Factories.Shapes.createBox(this.baseX, this.baseY, barHeight,
+											 this.materials.unselected);
+
+		//set height of model;
+		bar.position.set(0,0, this.boardZHeight + this.padding + (barHeight / 2) );
+		this.barObjList.push(new barObj(bar, barHeight, this.data[i], 'unselected'));
 	}
+
+
+	this.positionBars();
+
+	console.log(this.barObjList);
 
 
 }
 
-/*SortingModel.prototype.positionBars = function() {
-	
-}*/
+SortingModel.prototype.positionBars = function() {
+
+
+	var currentPos = new THREE.Vector3(0,0,0);
+
+	currentPos.x = -( ( (this.baseX * this.data.length) +
+										(this.baseX * this.spaceMulti * (this.data.length - 1))  ) / 2 ); 
+
+
+	var step = this.baseX + (this.baseX * this.spaceMulti); 
+
+	for(var i = 0; i < this.barObjList.length; i++) {
+		this.barObjList[i].mesh.position.x = currentPos.x;
+		// this.barObjList[i].mesh.position.y = currentPos.y; 
+		currentPos.x += step;
+	}
+}

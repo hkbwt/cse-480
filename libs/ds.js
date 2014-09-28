@@ -47,7 +47,7 @@ Graph.prototype =  {
 
         for(var j = 0; j < this.vertices; j++) {
             if(this.adj[i][j] != undefined) {
-                msg += + this.adj[i][j] + ' ';
+                msg += this.adj[i][j] + ' ';
             }
         }
 

@@ -210,7 +210,7 @@ SortingModel.prototype.positionBars = function() {
 	var currentPos = new THREE.Vector3(0,0,0);
 
 	currentPos.x = -( ( (this.baseX * this.data.length) +
-										(this.baseX * this.spaceMulti * (this.data.length - 1))  ) / 2 ); 
+					(this.baseX * this.spaceMulti * (this.data.length - 1))  ) / 2 ); 
 
 
 	var step = this.baseX + (this.baseX * this.spaceMulti); 
@@ -220,4 +220,32 @@ SortingModel.prototype.positionBars = function() {
 		// this.barObjList[i].mesh.position.y = currentPos.y; 
 		currentPos.x += step;
 	}
+}
+
+/*Binary Search Tree Model
+*/
+
+function BSTModel(tree, colorsList, lablesList, boardheight) {
+	this.boardZHeight = boardheight;
+	this.padding = 5;
+
+	this.tree = tree;
+	this.lables = lables;
+	this.colors = colors;
+	this.materials = {};
+	this.nodeList = [];
+	this.edgeList = [];
+
+	this.graphObj = undefined;
+
+	this.init();
+
+}
+
+BSTModel.prototype.init = function() {
+
+}
+
+BSTModel.prototype.createMaterials = function() {
+
 }

@@ -34,6 +34,8 @@
             g.addEdge(14,1);
             g.addEdge(10,22);
 
+            console.log(g.printGraph() );
+
             //binary search tree data structure
             var b = new BinarySearchTree(new TreeNode(5));
             b.add(15);
@@ -49,10 +51,6 @@
             b.preOrder();
             b.inorder();
             b.postOrder();
-
-
-
-            console.log(g.printGraph() );
 
             //initialize engine
             var e = new Engine("#WebGL-output", true, 0x000000, 1.0, true);
@@ -73,17 +71,25 @@
             var dirl = Factories.Lights.createDirectionalLight(new THREE.Vector3(0,0,1), Palettes.Halloween.white, 0.5)
 
 
+            //create plane board
             var pl = Factories.Shapes.createPlane({x: 1000, y: 1000}, plmat);
             pl.position.set(0,0,-1);
             //pl.rotation.x += -0.5 * Math.PI;
 
 
-            // var gmodel = new GraphModel(g, undefined, {nodeColor: Palettes.Halloween.purple, linkColor: Palettes.Halloween.black} );
+            //model constants
+
+            var colors = {nodeColor: Palettes.Rainbowz.blue, linkColor:  Palettes.Rainbowz.yellow};
 
 
-            // var smodel = new SortingModel([1, 5, 10, 2, 9, 7, 13, 26, 3, 8, 11], {selected: Palettes.Halloween.orange, unselected: Palettes.Halloween.green }, {x: 10, y: 10}, -1);
+            //create models
+
+            // var gmodel = new GraphModel(g, undefined, colors );
 
 
+            var smodel = new SortingModel([1, 5, 10, 2, 9, 7, 13, 26, 3, 8, 11], {selected: Palettes.Halloween.orange, unselected: Palettes.Halloween.green }, {x: 10, y: 10}, -1);
+
+/*            var bmodel = new BSTModel(b, colors);*/
 
 
             //create test shapes
@@ -105,9 +111,9 @@
 
 
             //add object to scene
-            e.scene.add(pl);
-            e.scene.add(sl);
-            e.scene.add(dirl);
+            e.scene.add(pl);        // plane
+            e.scene.add(sl);        // spotlight
+            e.scene.add(dirl);      // directional light
 
 /*            for(var i = 0; i < gmodel.nodeList.length; i++) {
                 e.scene.add(gmodel.nodeList[i].mesh);    
@@ -118,9 +124,9 @@
             }*/
 
 
-/*            for(var i = 0; i < smodel.barObjList.length; i++) {
+            for(var i = 0; i < smodel.barObjList.length; i++) {
                 e.scene.add(smodel.barObjList[i].mesh);    
-            }*/
+            }
 
             // e.scene.add(box);
             //e.scene.add(sp);

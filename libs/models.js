@@ -48,6 +48,10 @@ function barObj(mesh, height, value, state) {
 }
 */
 
+
+/*Graph Model
+*/
+
 function GraphModel (graph, lables, colors) {
 	this.graph = graph;
 	this.lables = lables;
@@ -223,20 +227,23 @@ SortingModel.prototype.positionBars = function() {
 }
 
 /*Binary Search Tree Model
+
+	Assume the links for each parent to their children forms an equalibrium triangle 
+	with 60 degree angles for each angle or (PI/3 randians)
 */
 
-function BSTModel(tree, colorsList, lablesList, boardheight) {
-	this.boardZHeight = boardheight;
+function BSTModel(tree, colorsList) {
+	this.boardZHeight = -1;
 	this.padding = 5;
 
 	this.tree = tree;
-	this.lables = lables;
 	this.colors = colors;
 	this.materials = {};
 	this.nodeList = [];
 	this.edgeList = [];
+	this.linkLength = 25;
 
-	this.graphObj = undefined;
+	this.treeObj = undefined;
 
 	this.init();
 
@@ -244,8 +251,85 @@ function BSTModel(tree, colorsList, lablesList, boardheight) {
 
 BSTModel.prototype.init = function() {
 
+/*	make materials
+	make nodes;
+	make position nodes;
+	make edges*/
+
+	var rootPos = new THREE.Vector3(0,0,0);
+
+	this.createMaterials();
+	this.createTree();
+
 }
 
 BSTModel.prototype.createMaterials = function() {
 
+	this.materials.nodeMat = Factories.Materials.createLambertMaterial(this.colors.nodeColor);
+	this.materials.linkMat = Factories.Materials.createLambertMaterial(this.colors.linkColor);
+}
+
+BSTModel.prototype.createTree = function() {
+	var currentPos = THREE.Vector3(0,0,0);
+	
+	//var size = this.tree.recSize(this.tree.root);
+	var nodeQueue = [];
+	var parentNode = undefined;
+	var Poscount = 0;
+
+	nodeQueue.queue(this.tree.root);
+
+	while(nodeQueue.length > 0) {
+
+		var currentNode = nodeQueue.shift();
+		count++;
+
+
+		var sp = Factories.Shapes.createSphere(5, this.materials.nodeMat);
+		sp.position.set(currentPos);
+
+		sp.userData = currentNode;
+
+		if(parentNode != undefined) {
+			createEdge(parentNode, currentNode);
+		}
+
+
+		if(currentNode.left != undefined) {
+			nodeQueue.push(currentNode.left);
+		}
+
+		if(currentNode.right != undefined) {
+			nodeQueue.push(currentNode.right);
+		}
+
+		parentNode = currentNode;
+
+
+
+
+
+
+
+
+
+
+	}
+	for( var i = 0; i < size; i++) {
+		
+		if(this.lables != undefined) {
+			this.nodeList.push(new vertexObj(sp, i, this.lables[i]));
+		}
+		else {
+			this.nodeList.push(new vertexObj(sp, i, "Vertex " + i.toString()));
+		}
+	}
+
+}
+
+
+
+
+BSTModel.prototype.getLevelLength = function() {
+	return this.linkLength * Math.sin(Math.PI/3);
 }

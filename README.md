@@ -3,103 +3,29 @@ cse-480
 
 The goal of this project is to visualize common computer science ideas, structures and theories in Webgl using three.js. Our development browser will be chrome, as it is the furthest along in implementing Webgl. Webgl provides the Opengl library in JavaScript. Opengl is used to render hardware accelerated 2d and 3d graphics; Webgl provides this in a web browser. Three.js is a high-level wrapper library to encapsulate the Webgl library; as well as implementing helper libraries for easier coding.
 
-Further_reading
-* http://www.khronos.org/webgl/wiki/Main_Page
-* http://www.opengl.org/wiki/Main_Page
-* http://threejs.org/
 
-Getting Started
-===============
-The first thing to do is to download git. if you're using windows download git here:
-* http://msysgit.github.io/
+File Structure
+==============
 
-or if you're using linux download git from the official repositories in you're preferred distribution.
-an example for arch linux
-```
-# pacman -S git
-```
-Afterwards git needs to be configured.
-```
-$ git config --global user.name "Your Name"
-$ git config --global user.email "your_email@whatever.com"
-```
-Then for Linux, Mac:
-```
-$ git config --global core.autocrlf input
-$ git config --global core.safecrlf true
-```
-Or for Windows:
-```
-$ git config --global core.autocrlf true
-$ git config --global core.safecrlf true
-```
-NOTE: if you get an error about crlf use this:
-```
-$ git config --global core.autocrlf false
-```
 
-Now that git is setup, the next thing to do is to setup your work area and download the project from github. First navigate to your desired directory. Then clone the repository
-```
-$ cd /home/user/path/to/workarea/
-$ git clone https://github.com/lakkthereof/cse-480.git
-```
+* ```/app``` - our code goes in here
+    * ```app.js``` - initializes babylon and navigates through algorithm scenes, etc
+    * ```adt.js``` - where all abstract data types should be kept
+    * ```models.js``` - where our 3d models for the adt should be kept
+    * ```palettes.js``` - where the color, lights and material themes should be kept 
+* ```/css``` - styling for debug.html
+* ```/libs``` -  3rd party JavaScript files like jQuery and Babylon go here
+    * ```babylon.1.13.js``` - babylon engine
+    * ```cannon.js``` - physics engine
+    * ```hand.1.3.8.js``` - touch and mouse events
+    * ```jquery-2.1.1.js``` - helper library
+* ```readme.md``` - this file
+* ```debug.html``` - testing our app
 
-now navigate to the cse-480 folder and create your own branch to work on
-```
-$ cd /home/user/path/to/workarea/cse-480/
-$ git checkout -b your_name
-```
-Now you are ready to code. Once finished and you want to push your changes to the remote repository you will need to do the following:
-```
-$ git add .
-$ git commit -m "what did I do in this commit"
-$ git push origin your_name
-```
-* NOTE: It should ask you for your username and password for github.
-* NOTE: Currently there is no need to setup a webserver to process these pages. However, if other assets are add this could be needed. 
-
-Congratulations, you have successfully contributed to the project!
-
-Further_reading
-* http://gitimmersion.com/lab_01.html
-* http://gitref.org/
-
-Basic Project Outline
-=====================
-After picking your subject matter, create a copy of the base file with the name of your subject in the tutorials directory 
-```
-$ cd /home/user/path/to/workarea/
-$ cp skeleton-canvas.html tutorials/your-subject-matter.html
-```
-Now open ```tutorials/your-subject-matter.html``` in your favorite text editor like notepad++ or vim and place your code in the highlighted area labeled: 
-```
-\\do Webgl stuff here...
-```
-All dependencies should be taken care of. The skeleton file uses css from the ```css/lean.css``` file and javascript libraries located in the ```libs/``` directory. it uses the debug version of three.js, jquery, stats and dat.gui libraries located in ```libs/```. 
-
-If you are having performance issues on older hardware I would suggest using the "min" versions of these files. They can also be found in the ```libs/``` folder. 
-
-* NOTE: Some extra css files are add in case they are needed. but currently they are not used in the skeleton file.
-
-Three.js Primer
-===============
-An example file can be found in the tutorials folder. In it you can see how to do the basics of rendering and updating the screen and using the stats and the gui libraries. I have also compiled a list of tutorials and books and real code for you to look at.
-
-Further_reading
-* https://www.youtube.com/channel/UCQakTdADmS_hLgGw6afzFNg
-* https://github.com/josdirksen/learning-threejs
-* https://drive.google.com/file/d/0B1D_AELyf6cGOWxTcFhNU2lLczg/edit?usp=sharing
-* http://threejs.org/docs/#Manual/Introduction/Creating_a_scene
-
-Computer Science Subject
-========================
-1. Tree Traversal 
+Computer Science Subject Ideas
+===============================
+1. Tree Traversal (Pre, In, Post)
 2. BFS / DFS
 3. Minimum Spanning Trees
 4. All-Pairs Shortest Paths / Single Source SP
-5. ?
-6. ?
-7. ?
-8. ?
-9. ?
-10. ?
+

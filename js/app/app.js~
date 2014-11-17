@@ -6,6 +6,7 @@ function FeelgoRhythm(documentId) {
 	this.canvas = document.getElementById(documentId);
 	this.engine = new BABYLON.Engine(this.canvas, true);
 	this.scene = new BABYLON.Scene(this.engine);
+	this.
 	this.model = undefined;
 	this.engine.runRenderLoop(this.renderLoop);
 	this.currentTheme = Themes.Rainbowz;

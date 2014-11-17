@@ -2,20 +2,28 @@
 /*
 *	"We want you to feel the algorithm"
 */
-function FeelgoRhythm(documentId) {
-	this.canvas = document.getElementById(documentId);
-	this.engine = new BABYLON.Engine(this.canvas, true);
-	this.scene = new BABYLON.Scene(this.engine);
-	this.
+
+var scene;
+var FeelgoRhythm = function(canvas, engine, scene1, num) {
+	var eng = engine;
+	this.canvas = canvas;
+	this.engine = engine;
+	var test = "michael madej";
+	this.scene = scene1;
+	//this. hit mat 
 	this.model = undefined;
-	this.engine.runRenderLoop(this.renderLoop);
+	engine.runRenderLoop(function(){
+	scene.render();});
 	this.currentTheme = Themes.Rainbowz;
-
-
+	
 	window.addEventListener("resize", function () {
-		this.engine.resize();
+			//this.engine.resize();
+			eng.resize();
+			
+		
 	});
-}
+	
+};
 
 FeelgoRhythm.prototype = {
 
@@ -37,6 +45,8 @@ FeelgoRhythm.prototype = {
 		this.initStandardMaterials();
 		this.initGround();
 		this.initDefaultLights();
+		this.initHitMat();
+		
 
 	},
 
@@ -124,22 +134,50 @@ FeelgoRhythm.prototype = {
 		this.model.addEdgeByValues(0,9);
 
 	},
-
-	renderLoop: function() {
-		this.scenes[0].render();	
+	initHitMat: function() {
+		var wall = BABYLON.Mesh.CreatePlane("wall", 1000.0, scene);
+		wall.material = new BABYLON.StandardMaterial("wallMat", scene);
+		wall.material.emissiveColor = new BABYLON.Color3(0.5, 1, 0.5);
+		wall.material.alpha = 1.0;
+	},
+	setBallDetecter: function(){
+		scene.onPointerDown = function (evt, pickResult) {
+                // if the click hits the ground object, we change the impact position
+                if (pickResult.hit) {
+                    console.log(pickResult.pickedPoint.x , pickResult.pickedPoint.y);
+                	//this.scene = newGraphObject.addVertex(scene, pickResult.pickedPoint.x, pickResult.pickedPoint.y);
+                	}
+                }
+                return scene;
 	},
 
 	dumpDebug: function() {
 		console.log(this);
+	},
+	addNewScene: function() {
+		
+		console.log(this.scene);
+		console.log(test);
+		
+		
 	}
+	
 };
 
 /*main function*/
+var documentId;
+	var canvas;
+	var engine;
+var app
 $( document ).ready( function() {
-	var app = new FeelgoRhythm('renderCanvas');
+	documentId = 'renderCanvas';
+	var canvas = document.getElementById(documentId);
+	engine = new BABYLON.Engine(canvas, true);
+	scene = new BABYLON.Scene(engine);
+	app = new FeelgoRhythm(canvas,engine,scene, 10);
 	app.initScene();
 	app.initGraphScene();
-
+	scene = app.setBallDetecter();
 	/*Menu Tabs*/
 
 	$('.app_menu').click( function() {

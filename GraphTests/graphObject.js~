@@ -1,0 +1,161 @@
+//Methods used to create a graph
+//will contain all graph objects
+//for this week imma just include generic graphs and BFS
+var vertexQueue = [];
+var edgeMeshArray = [];
+var vertexMeshArray = [];
+var scene;
+var graphObject =  function(scene){
+	this.maxSize = 50;
+	this.size = 0;
+	scene = scene;
+};
+
+graphObject.prototype = {
+	isEmpty: function(){
+	if(this.vertexMeshArray.length == 0){
+		return true;
+	}
+	else{
+		return false;
+	}
+	},
+	isFull: function(){
+	//return true if maxSize
+		if(this.maxSize <= this.size){
+			return true;
+		}
+		else{
+			return false;
+		}
+	},
+	addVertex: function(scene,locationX, locationY){
+		
+		var a = new graphVertex(vertexMeshArray.length.toString(),vertexMeshArray.length.toString());
+		//addEdgeEvent(vertexMeshArray[vertexMeshArray.length -1]);
+		vertexQueue.push(a)
+		var newScene = a.Create(scene ,vertexMeshArray.length.toString() ,locationX, locationY);
+		addEdgeEvent(this ,vertexMeshArray[vertexMeshArray.length -1]);
+		return newScene;
+	//If graph is not full
+	// vertex is not already added to graph
+	
+	},
+	hasVertex: function(vertexObject){
+	//returns true if graph has vertex
+		return 0;
+	},
+	addEdge: function(fromVertexObject, toVertexObject){
+	//add edge to vertices
+		for(var i = 0; i< vertexQueue.length; i++){
+			if(vertexQueue[i].name == edgeCountArray[0].name){
+				edgeMeshArray.push(BABYLON.Mesh.CreateLines(edgeCountArray[0].name.toString() + "to" +edgeCountArray[1].name.toString() , [edgeCountArray[0].position, edgeCountArray[1].position], scene));
+				vertexQueue[i].adjacentQueue.push(edgeCountArray[1]);
+			}
+			if(vertexQueue[i].name == edgeCountArray[1].name){
+				vertexQueue[i].adjacentQueue.push(edgeCountArray[0]);
+			}
+		}
+		//add line to connect
+		return scene;
+	},
+	weightIs: function(fromVertexObject, toVertexObject){
+		return 0;
+	},
+	getToVertices: function(vertexObject){
+	//return queue of the vertices that are adjacent from vertex
+	},
+	clearMarks: function(){
+	//clear marks on vertices
+	},
+	markVertex: function(vertexObject){
+	//sets mark for vertex to true
+	},
+	getUnmarked: function(){
+	//returns an unmarked vertex if any exist: otherwise, return null
+	}
+	
+
+}; 
+
+var graphVertex = function(value, name){
+	this.marked = false;
+	this.value = value;
+	this.name = name;
+	this.adjacentQueue = [];
+	
+}
+
+//graphVertex.prototype = {//whatever contains the webgl creation methods.
+
+graphVertex.prototype.Create = function(scene, name, x, y){
+
+	var defaultMaterial = new BABYLON.StandardMaterial("wallMat", scene);
+		
+		var backgroundTexture2 = new BABYLON.DynamicTexture("dynamic texture", 512, scene, true);
+		
+		backgroundTexture2.drawText(name, null, 350, "bold 100px Segoe UI", "white", "#555555");
+		defaultTexture = new BABYLON.DynamicTexture("dynamic texture", 512, scene, true);
+    		defaultTexture.hasAlpha = true;
+		defaultMaterial.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+    		defaultMaterial.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+ 		defaultMaterial.emissiveColor = BABYLON.Color3.Blue();
+		vertexMeshArray.push(BABYLON.Mesh.CreateSphere(name, 8.0, 4.0, scene));
+		vertexMeshArray[vertexMeshArray.length -1].position = new BABYLON.Vector3(x, y, -0.1);
+		vertexMeshArray[vertexMeshArray.length -1].material = defaultMaterial;
+		vertexMeshArray[vertexMeshArray.length -1].material.diffuseTexture = backgroundTexture2;
+		
+		return scene;
+}
+
+
+var edgeCountArray = [];
+
+function addEdgeEvent(graphObject,mesh){
+	var defaultMaterial = new BABYLON.StandardMaterial("wallMat", scene);
+	
+    		
+ 		defaultMaterial.emissiveColor = BABYLON.Color3.Blue();
+
+
+		var redMat = new BABYLON.StandardMaterial("wallMat", scene);
+    		redMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+    		redMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+ 		redMat.emissiveColor = BABYLON.Color3.Red();		
+
+
+		mesh.actionManager = new BABYLON.ActionManager(scene);
+		mesh.actionManager.registerAction(
+            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh.material, "emissiveColor", new BABYLON.Color3.Red()))
+		
+		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+		function(){
+			edgeCountArray.push(mesh);
+			
+			if(edgeCountArray.length >= 2){
+			graphObject.addEdge(scene,edgeCountArray[0], edgeCountArray[1]);
+			for(var i = 0; i < edgeCountArray.length; i++){
+				edgeCountArray[i].material.emissiveColor = new BABYLON.Color3.Blue();;
+				//get positions
+				
+			}
+			edgeCountArray = [];
+			edgeCounter = 0;		
+
+		}
+			}));
+}
+
+
+graphVertex.prototype.color = function(mesh){
+	//takes a mesh object and changes its color property
+	//sphereObject function call
+}
+graphVertex.prototype.marked = function(){
+	//used Searches
+	//based on color return true or false
+	this.marked = true;	
+}
+addAdjacentVertex = function(vertex){
+	adjacentQueue.append(vertex);
+};

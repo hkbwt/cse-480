@@ -11,7 +11,8 @@
 
 /*Graph Model
 */
-
+var nodeCountArray = [];
+var GlobTheme;
 function GraphModel (scene, vertices, theme, size) {
 	if(vertices == undefined) {
 		vertices = 0;
@@ -19,10 +20,10 @@ function GraphModel (scene, vertices, theme, size) {
 
 	this.graph = new Graph(vertices);
 	this.theme = theme;
+	GlobTheme = theme;
 	this.scene = scene;
 	this.meshSize = 5.0;
 	this.meshSegments = 5.0;
-
 
 	if(size == 'small') {
 		this.meshSize = 3.0;
@@ -46,11 +47,12 @@ GraphModel.prototype = {
 	init: function() {		
 
 		for(var currVertex = 0; currVertex < this.graph.vertCount; currVertex++) {
-			var currVertexMesh = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(currVertex), 
-						this.meshSegments, this.meshSize, this.scene);
-			currVertexMesh.setMaterialByID(this.theme.vertexMat);
-			BABYLON.Tags.EnableFor(currVertexMesh);
-			currVertexMesh.addTags("vertex");
+			//var currVertexMesh = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(currVertex), 
+						//this.meshSegments, this.meshSize, this.scene);
+			//currVertexMesh.setMaterialByID(this.theme.vertexMat);
+			//BABYLON.Tags.EnableFor(currVertexMesh);
+			//currVertexMesh.addTags("vertex");
+			this.addVertex(currVertex, [0,0,0]);
 		}
 
 		this.organizeModel();
@@ -93,21 +95,107 @@ GraphModel.prototype = {
 
 	addVertex: function(value, position){
 		this.graph.addVertex(value);
-		var vertex = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(this.vertCount - 1), 
+		var defaultMaterial = new BABYLON.StandardMaterial("wallMat", scene);
+		var vertex = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(value), 
 					this.meshSegments, this.meshSize, this.scene);
 		vertex.position = position;
-		vertex.setMaterialByID(this.theme.vertexMat);
-
+		//vertex.setMaterialByID(this.theme.vertexMat);
+		defaultMaterial.emissiveColor = BABYLON.Color3.Blue();
+		vertex.material = defaultMaterial;
+		this.addVertexClickEvent(this, vertex);
 		BABYLON.Tags.EnableFor(vertex);
 		vertex.addTags("vertex");
 	},
+	
+	addVertexClickEvent: function(graphModel, mesh){
+		mesh.actionManager = new BABYLON.ActionManager(scene);
+		mesh.actionManager.registerAction(
+            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh.material, "emissiveColor", new BABYLON.Color3.Red()));
+		
+		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+		function(){
+			switch(true /*state*/){
+			case "addVertice":
+				//do nothing
+				break;
+			case true:
+				//add an edge to the vertices
+				nodeCountArray.push(mesh);
+			
+				if(nodeCountArray.length >= 2){
+					graphModel.addEdgeByMeshes(nodeCountArray[0], nodeCountArray[1]);
+					for(var i = 0; i < nodeCountArray.length; i++){
+						nodeCountArray[i].material.emissiveColor = new BABYLON.Color3.Blue();;
+				//get positions
+					}
+					nodeCountArray = [];
+					edgeCounter = 0;		
+				}
+				break;
+			case "bfs":
+				nodeCountArray.push(mesh);
+				if(nodeCountArray.length >= 1){
+					bfsPauseTest();
+				//get positions
+					nodeCountArray = [];
+					edgeCounter = 0;
+				}		
+				break;
+			}
+			
+			}));
+	},
 
 	removeEdge: function(name) {
-		//code here	
+		var allEdgeArray = scene.getMeshesByTags("edge");
+		for(var i = 0; i<allEdgeArray.length; i++){
+			if(allEdgeArray[i].name == name){
+				allEdgeArray[i].dispose();	
+			}
+			
+		}
+			
 	},
 
 	removeVertex: function(name) {
 		//code here
+		var edgeArray= [];
+		var allEdgeArray = scene.getMeshesByTags("edge");
+		var vertex = this.graph.getVertexIdByName(name);
+		for(var i = 0; i<allEdgeArray.length; i++){
+			if(allEdgeArray[i].name.indexOf("_" + vertex.toString() + "_") > -1){
+				edgeArray.push(allEdgeArray[i].name);		
+			}
+			else if(allEdgeArray[i].name.indexOf("_" + vertex.toString()) > -1){
+				edgeArray.push(allEdgeArray[i].name);	
+			}
+		}
+		var vertices = scene.getMeshesByTags("vertex");
+		for(var i = 0; i< vertices.length; i++){
+			if(vertices[i].name = name){
+				vertices[i].dispose();
+				for(var j = 0; j < edgeArray.length; j++){
+					this.removeEdge(edgeArray[j]);
+				}
+				break;
+			}
+		}
+
+		
+		
+		
+	},
+	removeAll: function(){
+		var n = scene.getMeshesByTags("edge");
+		var m = scene.getMeshesByTags("vertex");
+		console.log(n);
+		console.log(m);
+		for(var i = 0; i< n.length; i++){
+			n[i].dispose();
+		}	
+		for(var i = 0; i< m.length; i++){
+			m[i].dispose();
+		}
 	},
 
 	organizeModel: function() {

@@ -4,6 +4,7 @@
 */
 
 var scene;
+var model;
 var FeelgoRhythm = function(canvas, engine, scene1, num) {
 	var eng = engine;
 	this.canvas = canvas;
@@ -132,6 +133,8 @@ FeelgoRhythm.prototype = {
 		this.model.addEdgeByValues(5,1);
 		this.model.addEdgeByValues(3,1);
 		this.model.addEdgeByValues(0,9);
+		console.log(this.model);
+		model = this.model;
 
 	},
 	initHitMat: function() {

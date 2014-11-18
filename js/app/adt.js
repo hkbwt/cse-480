@@ -55,6 +55,9 @@ Graph.prototype =  {
 	    this.adjList[w].push(v);
 	    this.edgeCount++;
     },
+    removeEdge: function(v){
+		
+	},
 
     addVertex: function(value) {
     	this.adjList.push([]);

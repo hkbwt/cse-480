@@ -11,7 +11,8 @@
 
 /*Graph Model
 */
-
+var nodeCountArray = [];
+var GlobTheme;
 function GraphModel (scene, vertices, theme, size) {
 	if(vertices == undefined) {
 		vertices = 0;
@@ -19,10 +20,10 @@ function GraphModel (scene, vertices, theme, size) {
 
 	this.graph = new Graph(vertices);
 	this.theme = theme;
+	GlobTheme = theme;
 	this.scene = scene;
 	this.meshSize = 5.0;
 	this.meshSegments = 5.0;
-	that = this;
 
 	if(size == 'small') {
 		this.meshSize = 3.0;
@@ -59,35 +60,18 @@ GraphModel.prototype = {
 	
 	addEdgeByValues: function(v, w) {
 
-		//point to point
-		
 		var fromVertexName = this.graph.getVertexNameById(v);
 		var toVertexName = this.graph.getVertexNameById(w);
+
 		var fromVertex = this.scene.getMeshByName(fromVertexName);
 		var toVertex = this.scene.getMeshByName(toVertexName);
-		var distance = BABYLON.Vector3.Distance(fromVertex.position, toVertex.position);
-		var edge = BABYLON.Mesh.CreateCylinder(this.graph.getEdgeNameById(v,w), (BABYLON.Vector3.Distance(fromVertex.position, toVertex.position)), 1, 1, 0, 1, this.scene, true)
-		// First of all we have to set the pivot not in the center of the cylinder:
-		edge.setPivotMatrix(BABYLON.Matrix.Translation(0, -distance / 2, 0));
-		// Then move the cylinder to red sphere
-		edge.position = toVertex.position;
-		// Then find the vector between spheres
-		var v1 = toVertex.position.subtract(fromVertex.position);
-		v1.normalize();
-		var v2 = new BABYLON.Vector3(0, 1, 0);
-		// Using cross we will have a vector perpendicular to both vectors
-		var axis = BABYLON.Vector3.Cross(v1, v2);
-		axis.normalize();
-		// Angle between vectors
-		var angle = BABYLON.Vector3.Dot(v1, v2);
-		console.log(angle);
-		// Then using axis rotation the result is obvious
-		edge.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, -Math.PI / 2 + angle);
-		
 
 		this.graph.addEdge(v, w);
-		//edge.isPickable = true;
-		edge.material = this.scene.getMaterialByID(this.theme.edgeMat);
+
+		var edge = BABYLON.Mesh.CreateLines(this.graph.getEdgeNameById(v,w),
+			 		[fromVertex.position, toVertex.position], this.scene);
+		
+		edge.color = this.scene.getMaterialByID(this.theme.edgeMat).diffuseColor;
 		BABYLON.Tags.EnableFor(edge);
 		edge.addTags("edge")
 		this.addEdgeDetectEvent(edge);
@@ -95,99 +79,83 @@ GraphModel.prototype = {
 
 
 	addEdgeByMeshes: function(fromVertex, toVertex) {
-		
+
 		var v = this.graph.getVertexIdByName(fromVertex.name);
 		var w = this.graph.getVertexIdByName(toVertex.name);
-		//
-		var distance = BABYLON.Vector3.Distance(fromVertex.position, toVertex.position);
-		var edge = BABYLON.Mesh.CreateCylinder(this.graph.getEdgeNameById(v,w), (BABYLON.Vector3.Distance(fromVertex.position, toVertex.position)), 1, 1, 0, 1, this.scene, true)
-		// First of all we have to set the pivot not in the center of the cylinder:
-		edge.setPivotMatrix(BABYLON.Matrix.Translation(0, -distance / 2, 0));
-		// Then move the cylinder to red sphere
-		edge.position = toVertex.position;
-		// Then find the vector between spheres
-		var v1 = toVertex.position.subtract(fromVertex.position);
-		v1.normalize();
-		var v2 = new BABYLON.Vector3(0, 1, 0);
-		// Using cross we will have a vector perpendicular to both vectors
-		var axis = BABYLON.Vector3.Cross(v1, v2);
-		axis.normalize();
-		// Angle between vectors
-		var angle = BABYLON.Vector3.Dot(v1, v2);
-		// Then using axis rotation the result is obvious
-		edge.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, -Math.PI / 2 + angle);
-		edge.material = this.scene.getMaterialByID(this.theme.edgeMat);
+
+		this.graph.addEdge(v, w);
+
+
+		var edge = BABYLON.Mesh.CreateLines(this.graph.getEdgeNameById(v,w),
+			 		[fromVertex.position, toVertex.position], this.scene);
+		
+		edge.color = this.scene.getMaterialByID(this.theme.edgeMat).diffuseColor;
 		BABYLON.Tags.EnableFor(edge);
 		edge.addTags("edge")
-		//
-		this.graph.addEdge(v, w);
-		//old funcitonality
-		//var edge = BABYLON.Mesh.CreateLines(this.graph.getEdgeNameById(v,w),
-		//	 		[fromVertex.position, toVertex.position], this.scene);
 		this.addEdgeDetectEvent(edge);
 	},	
 	addEdgeDetectEvent: function(edge){
-		edge.actionManager = new BABYLON.ActionManager(this.scene);
-		edge.actionManager.registerAction(
-			new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, edge, "emissiveColor", that.scene.getMaterialByID(that.theme.activeMatOne).diffuseColor));
-            	edge.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+		edge.actionManager = new BABYLON.ActionManager(scene);
+		edge.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
 		function(){
-		if(true /*state*/){
-			edge.dispose();
-		}
-		}));
+			//if state="removeEdge"
+			//removeEdge(edge.name);
+			alert("hi");
+			}));
+
 	},
 
 	addVertex: function(value, position){
 		this.graph.addVertex(value);
-		var defaultMaterial = new BABYLON.StandardMaterial("wallMat", this.scene);
+		var defaultMaterial = new BABYLON.StandardMaterial("wallMat", scene);
 		var vertex = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(value), 
 					this.meshSegments, this.meshSize, this.scene);
 		vertex.position = position;
 		//vertex.setMaterialByID(this.theme.vertexMat);
-		//defaultMaterial.emissiveColor = this.scene.getMaterialByID(this.theme.activeMatOne).diffuseColor;
-		vertex.material = this.scene.getMaterialByID(this.theme.activeMatOne);
-		this.addVertexClickEvent(vertex);
+		defaultMaterial.emissiveColor = BABYLON.Color3.Blue();
+		vertex.material = defaultMaterial;
+		this.addVertexClickEvent(this, vertex);
 		BABYLON.Tags.EnableFor(vertex);
 		vertex.addTags("vertex");
 	},
 	
-	addVertexClickEvent: function( mesh){
-		mesh.actionManager = new BABYLON.ActionManager(this.scene);
+	addVertexClickEvent: function(graphModel, mesh){
+		mesh.actionManager = new BABYLON.ActionManager(scene);
 		mesh.actionManager.registerAction(
-            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh, "material", that.scene.getMaterialByID(that.theme.activeMatTwo)));
-		that.nodeCountArray = [];
+            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh.material, "emissiveColor", new BABYLON.Color3.Red()));
+		
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
 		function(){
-			that.thatter;
 			switch(true /*state*/){
 			case "addVertice":
 				//do nothing
 				break;
 			case true:
 				//add an edge to the vertices
-				that.nodeCountArray.push(mesh)
+				nodeCountArray.push(mesh);
 			
-				if(that.nodeCountArray.length >= 2){
-					that.addEdgeByMeshes(that.nodeCountArray[0], that.nodeCountArray[1]);
-					for(var i = 0; i < that.nodeCountArray.length; i++){
-						that.nodeCountArray[i].material = that.scene.getMaterialByID(that.theme.activeMatOne);
+				if(nodeCountArray.length >= 2){
+					graphModel.addEdgeByMeshes(nodeCountArray[0], nodeCountArray[1]);
+					for(var i = 0; i < nodeCountArray.length; i++){
+						nodeCountArray[i].material.emissiveColor = new BABYLON.Color3.Blue();;
 				//get positions
 					}
-					that.nodeCountArray = [];		
+					nodeCountArray = [];
+					edgeCounter = 0;		
 				}
 				break;
 			case "bfs":
-				thatter.push(mesh);
-				if(that.nodeCountArray.length >= 1){
+				nodeCountArray.push(mesh);
+				if(nodeCountArray.length >= 1){
 					bfsPauseTest();
 				//get positions
-					that.nodeCountArray = [];
+					nodeCountArray = [];
+					edgeCounter = 0;
 				}		
 				break;
 			}
+			
 			}));
-		 
 	},
 
 	removeEdge: function(name) {

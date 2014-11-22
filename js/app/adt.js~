@@ -21,9 +21,9 @@ function Graph(vertCount) {
     }
 
     //initialize starting adjacency lists
-   // for(var i = 0; i < this.vertCount; i++){
-   //     this.adjList.push([]);
-   // }
+    for(var i = 0; i < this.vertCount; i++){
+        this.adjList.push([]);
+    }
 
 }
 
@@ -62,7 +62,7 @@ Graph.prototype =  {
     addVertex: function(value) {
     	this.adjList.push([]);
     	this.valueList.push(value);
-    	//this.VertCount++;
+    	this.VertCount++;
     },
 
     printGraph: function() {

@@ -4,6 +4,7 @@
 */
 
 var scene;
+var model;
 var FeelgoRhythm = function(canvas, engine, scene1, num) {
 	var eng = engine;
 	this.canvas = canvas;
@@ -132,6 +133,8 @@ FeelgoRhythm.prototype = {
 		this.model.addEdgeByValues(5,1);
 		this.model.addEdgeByValues(3,1);
 		this.model.addEdgeByValues(0,9);
+		console.log(this.model);
+		model = this.model;
 
 	},
 	initHitMat: function() {
@@ -139,20 +142,6 @@ FeelgoRhythm.prototype = {
 		wall.material = new BABYLON.StandardMaterial("wallMat", scene);
 		wall.material.emissiveColor = new BABYLON.Color3(0.5, 1, 0.5);
 		wall.material.alpha = 1.0;
-		wall.actionManager = new BABYLON.ActionManager(scene);
-		wall.actionManager.registerAction(
-            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, wall.material, "emissiveColor", new BABYLON.Color3.Red()));
-            	wall.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
-            		function (pickResult) {
-                // if the click hits the ground object, we change the impact position
-                	
-                	//locations for new vertex
-                	//if(state == "addVertex && upEvent on addVertex")
-               		 console.log(pickResult.pointerX);
-               		 console.log(pickResult.pointerY);
-		
-		
-            }));
 	},
 	setBallDetecter: function(){
 		scene.onPointerDown = function (evt, pickResult) {

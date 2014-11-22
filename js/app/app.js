@@ -44,7 +44,6 @@ FeelgoRhythm.prototype = {
 		this.initStandardMaterials();
 		this.initGround();
 		this.initDefaultLights();
-		this.initHitMat();
 		
 
 	},
@@ -134,23 +133,6 @@ FeelgoRhythm.prototype = {
 		console.log(this.model);
 	},
 	
-	initHitMat: function() {
-		var wall = BABYLON.Mesh.CreatePlane("wall", 1000.0, this.scene);
-		wall.material = new BABYLON.StandardMaterial("wallMat", this.scene);
-		wall.material.emissiveColor = new BABYLON.Color3(0.5, 1, 0.5);
-		wall.material.alpha = 1.0;
-	},
-	setBallDetecter: function(){
-		this.scene.onPointerDown = function (evt, pickResult) {
-                // if the click hits the ground object, we change the impact position
-                if (pickResult.hit) {
-                    console.log(pickResult.pickedPoint.x , pickResult.pickedPoint.y);
-                	//this.scene = newGraphObject.addVertex(scene, pickResult.pickedPoint.x, pickResult.pickedPoint.y);
-                	}
-                }
-                return this.scene;
-	},
-
 	dumpDebug: function() {
 		console.log(this);
 	},
@@ -170,7 +152,6 @@ $( document ).ready( function() {
 	app = new FeelgoRhythm('renderCanvas');
 	app.initScene();
 	app.initGraphScene();
-	scene = app.setBallDetecter();
 	/*Menu Tabs*/
 
 	$('.app_menu').click( function() {

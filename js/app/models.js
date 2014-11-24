@@ -16,12 +16,14 @@ function GraphModel (scene, vertices, theme, size) {
 	if(vertices == undefined) {
 		vertices = 0;
 	}
-
+	this.graphState;
 	this.graph = new Graph(vertices);
 	this.theme = theme;
 	this.scene = scene;
 	this.meshSize = 5.0;
 	this.meshSegments = 5.0;
+	this.bfsFrames;
+	this.playBFSPosition = 0;
 	that = this;
 
 	if(size == 'small') {
@@ -45,16 +47,8 @@ GraphModel.prototype = {
 
 	init: function() {		
 
-		for(var currVertex = 0; currVertex < this.graph.vertCount; currVertex++) {
-			//var currVertexMesh = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(currVertex), 
-						//this.meshSegments, this.meshSize, this.scene);
-			//currVertexMesh.setMaterialByID(this.theme.vertexMat);
-			//BABYLON.Tags.EnableFor(currVertexMesh);
-			//currVertexMesh.addTags("vertex");
-			this.addVertex(currVertex, [0,0,0]);
-		}
-
-		this.organizeModel();
+		//print something pretty to the console
+		console.log("0_0!");
 	},
 	
 	addEdgeByValues: function(v, w) {
@@ -133,12 +127,18 @@ GraphModel.prototype = {
             	edge.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
 		function(){
 		if(true /*state*/){
-			edge.dispose();
+			that.removeEdge(edge.name);
 		}
 		}));
 	},
 
 	addVertex: function(value, position){
+		if(typeof(value) =="undefined" && typeof(this.graph.vertCount) == "undefined"){
+			value = 0;
+		}
+		else{
+			value = this.graph.vertCount;
+		}
 		this.graph.addVertex(value);
 		var defaultMaterial = new BABYLON.StandardMaterial("wallMat", this.scene);
 		var vertex = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(value), 
@@ -146,44 +146,55 @@ GraphModel.prototype = {
 		vertex.position = position;
 		//vertex.setMaterialByID(this.theme.vertexMat);
 		//defaultMaterial.emissiveColor = this.scene.getMaterialByID(this.theme.activeMatOne).diffuseColor;
-		vertex.material = this.scene.getMaterialByID(this.theme.activeMatOne);
+		vertex.material = this.scene.getMaterialByID(this.theme.vertexMat);
 		this.addVertexClickEvent(vertex);
 		BABYLON.Tags.EnableFor(vertex);
 		vertex.addTags("vertex");
+		this.organizeModel();
 	},
 	
 	addVertexClickEvent: function( mesh){
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(
-            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh, "material", that.scene.getMaterialByID(that.theme.activeMatTwo)));
+            new BABYLON.SetValueAction(BABYLON.ActionManager.OnPickTrigger, mesh, "material", that.scene.getMaterialByID(that.theme.activeMatOne)));
 		that.nodeCountArray = [];
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
 		function(){
-			that.thatter;
-			switch(true /*state*/){
+			switch(that.graphState /*state*/){
 			case "addVertice":
 				//do nothing
+				//can be used later if 
 				break;
-			case true:
+			case "addEdge":
 				//add an edge to the vertices
 				that.nodeCountArray.push(mesh)
 			
 				if(that.nodeCountArray.length >= 2){
 					that.addEdgeByMeshes(that.nodeCountArray[0], that.nodeCountArray[1]);
 					for(var i = 0; i < that.nodeCountArray.length; i++){
-						that.nodeCountArray[i].material = that.scene.getMaterialByID(that.theme.activeMatOne);
+						that.nodeCountArray[i].material = that.scene.getMaterialByID(that.theme.vertexMat);
 				//get positions
 					}
 					that.nodeCountArray = [];		
 				}
 				break;
+			case "removeVertice":
+				that.removeVertex(mesh.name)
+				break;
 			case "bfs":
-				thatter.push(mesh);
+				that.nodeCountArray.push(mesh);
+				that.playBFSPosition = 0;
 				if(that.nodeCountArray.length >= 1){
-					bfsPauseTest();
-				//get positions
+					var that2 = that;
+					var n = new runBFS(that.graph, that, that.scene);
+					that2.bfsFrames = n.bfsTest(that2.graph.getVertexIdByName(that2.nodeCountArray[0].name));
+					that = that2;
 					that.nodeCountArray = [];
 				}		
+				break;
+			case "shortest path":
+				break;
+			case "dfs":
 				break;
 			}
 			}));
@@ -191,11 +202,12 @@ GraphModel.prototype = {
 	},
 
 	removeEdge: function(name) {
-		var allEdgeArray = scene.getMeshesByTags("edge");
+		var allEdgeArray = this.scene.getMeshesByTags("edge");
 		for(var i = 0; i<allEdgeArray.length; i++){
 			if(allEdgeArray[i].name == name){
 				allEdgeArray[i].dispose();	
 			}
+			this.graph.removeEdge(name);
 			
 		}
 			
@@ -204,7 +216,7 @@ GraphModel.prototype = {
 	removeVertex: function(name) {
 		//code here
 		var edgeArray= [];
-		var allEdgeArray = scene.getMeshesByTags("edge");
+		var allEdgeArray = this.scene.getMeshesByTags("edge");
 		var vertex = this.graph.getVertexIdByName(name);
 		for(var i = 0; i<allEdgeArray.length; i++){
 			if(allEdgeArray[i].name.indexOf("_" + vertex.toString() + "_") > -1){
@@ -214,7 +226,7 @@ GraphModel.prototype = {
 				edgeArray.push(allEdgeArray[i].name);	
 			}
 		}
-		var vertices = scene.getMeshesByTags("vertex");
+		var vertices = this.scene.getMeshesByTags("vertex");
 		for(var i = 0; i< vertices.length; i++){
 			if(vertices[i].name = name){
 				vertices[i].dispose();
@@ -224,14 +236,16 @@ GraphModel.prototype = {
 				break;
 			}
 		}
+		this.graph.removeVertex(name);
+		
 
 		
 		
 		
 	},
 	removeAll: function(){
-		var n = scene.getMeshesByTags("edge");
-		var m = scene.getMeshesByTags("vertex");
+		var n = this.scene.getMeshesByTags("edge");
+		var m = this.scene.getMeshesByTags("vertex");
 		console.log(n);
 		console.log(m);
 		for(var i = 0; i< n.length; i++){
@@ -241,33 +255,89 @@ GraphModel.prototype = {
 			m[i].dispose();
 		}
 	},
+	
+	playBFS: function(){
+		switch(this.graphState){
+		case "play":
+			if(this.playBFSPosition < this.bfsFrames.length){
+			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
+			 this.playBFSPosition++;
+			 setTimeout(function(){that.playBFS();}, 500);
+			}
+			else{;
+				this.graphState = "end";
+			}
+			break;
+		case "pause":
+			break;
+		case "rewind":
+			if(this.playBFSPosition > 0){
+				this.playBFSPosition--;	
+			}
+			if(this.playBFSPosition < this.bfsFrames.length){
+			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
+			}
+			break;
+		case "forward":
+			if(this.playBFSPosition < this.bfsFrames.length){
+				this.playBFSPosition++;	
+			}
+			if(this.playBFSPosition < this.bfsFrames.length){
+			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
+			}
+			break;
+		case "end":
+			break;
+		}
+	},
 
 	organizeModel: function() {
 
-		var currVertexCount = 0;	//number of node in current circle
-		var vertexLimit = 1;		//max number of nodes allowed in current circle 
-		var radius = 0;				//current circles radius
-		var theta = 0;				//angle of current circle
-		var dtheta = 0;				//rate of change in the arch of the circle
+		this.currVertexCount;		                //number of node in current circle
+		if(typeof(this.currVertexCount) == "undefined")
+		{
+			this.currVertexCount = 0;
+		}
+		this.vertexLimit;				//max number of nodes allowed in current circle
+		if(typeof(this.vertexLimit) == "undefined")
+		{
+			this.vertexLimit = 0;
+		}
+								 
+		this.radius;					//current circles radius
+		if(typeof(this.radius) == "undefined")
+		{
+			this.radius = 0;
+		}
+		this.theta;					//angle of current circle
+		if(typeof(this.theta) == "undefined")
+		{
+			this.theta = 0;
+		}
+		this.dtheta;					//rate of change in the arch of the circle
+		if(typeof(this.dtheta) == "undefined")
+		{
+			this.dtheta = 0;
+		}
 
 		var vertexList = this.scene.getMeshesByTags("vertex");
 
 		for(var vertex = 0; vertex < vertexList.length; vertex++) {
-			var coord = this.getCircleCoords(radius, theta);
+			var coord = this.getCircleCoords(this.radius, this.theta);
 			vertexList[vertex].position = new BABYLON.Vector3(coord.x, 5, coord.y);
 
-			currVertexCount++;
+			this.currVertexCount++;
 
-			if(currVertexCount >= vertexLimit) {
-				vertexLimit += 2;
-				currVertexCount = 0;
-				radius = 6.5 * vertexLimit;
+			if(this.currVertexCount >= this.vertexLimit) {
+				this.vertexLimit += 2;
+				this.currVertexCount = 0;
+				this.radius = 6.5 * this.vertexLimit;
 				
-				theta +=  Math.sqrt(3) / 2 * vertexLimit;
-				dtheta = 2 * Math.PI / vertexLimit;
+				this.theta +=  Math.sqrt(3) / 2 * this.vertexLimit;
+				this.dtheta = 2 * Math.PI / this.vertexLimit;
 			}
 			else {
-				theta += dtheta;
+				this.theta += this.dtheta;
 			}  
 
 		}
@@ -275,6 +345,23 @@ GraphModel.prototype = {
 
 	getCircleCoords: function(radius, theta){
 		return {x: radius * Math.cos(theta) , y: radius * Math.sin(theta)};
+	},
+	
+	randomGraph: function(){
+		//generate a number of vertices and a number of edges
+		this.removeAll();
+		this.currVertexCount = 0;
+		this.vertexLimit = 0;
+		this.radius = 0;
+		this.theta = 0;
+		this.dtheta = 0;
+		var randVertices = Math.floor((Math.random() * 30) + 1);
+		var randEdges = Math.floor((Math.random() * (randVertices * (randVertices - 1))));
+		
+		for(var i = 0; i< randVertices; i++){
+			this.addVertex(i,[0,0,0]);
+		}
+		this.organizeModel();
 	}
 };
 		

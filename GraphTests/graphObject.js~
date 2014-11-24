@@ -5,11 +5,26 @@ var vertexQueue = [];
 var edgeMeshArray = [];
 var vertexMeshArray = [];
 var scene;
+var state = "addVertice";
 var graphObject =  function(scene){
 	this.maxSize = 50;
 	this.size = 0;
 	scene = scene;
 };
+
+function ChangeState(num){
+	switch(num){
+		case 1:
+			state = "addVertice";
+			break;
+		case 2: 
+			state = "addEdge";
+			break;
+		case 3:
+			state = "bfs";
+			break;
+	}
+}
 
 graphObject.prototype = {
 	isEmpty: function(){
@@ -47,13 +62,21 @@ graphObject.prototype = {
 	},
 	addEdge: function(fromVertexObject, toVertexObject){
 	//add edge to vertices
+	var exists = false;
+	var edgeName = nodeCountArray[0].name.toString() + "to" +nodeCountArray[1].name.toString()
+	var altName = nodeCountArray[1].name.toString() + "to" +nodeCountArray[0].name.toString()
 		for(var i = 0; i< vertexQueue.length; i++){
-			if(vertexQueue[i].name == edgeCountArray[0].name){
-				edgeMeshArray.push(BABYLON.Mesh.CreateLines(edgeCountArray[0].name.toString() + "to" +edgeCountArray[1].name.toString() , [edgeCountArray[0].position, edgeCountArray[1].position], scene));
-				vertexQueue[i].adjacentQueue.push(edgeCountArray[1]);
+			if(vertexQueue[i].name == nodeCountArray[0].name){
+				for(var j = 0; j< edgeMeshArray.length; j++){
+					if(edgeMeshArray[j].name == edgeName || edgeMeshArray[j].name == altName){
+						return scene;	
+					}
+				}
+				edgeMeshArray.push(BABYLON.Mesh.CreateLines(edgeName , [nodeCountArray[0].position, nodeCountArray[1].position], scene));
+				vertexQueue[i].adjacentQueue.push(nodeCountArray[1].name);
 			}
-			if(vertexQueue[i].name == edgeCountArray[1].name){
-				vertexQueue[i].adjacentQueue.push(edgeCountArray[0]);
+			if(vertexQueue[i].name == nodeCountArray[1].name){
+				vertexQueue[i].adjacentQueue.push(nodeCountArray[0].name);
 			}
 		}
 		//add line to connect
@@ -62,17 +85,25 @@ graphObject.prototype = {
 	weightIs: function(fromVertexObject, toVertexObject){
 		return 0;
 	},
-	getToVertices: function(vertexObject){
+	getToVertices: function(verticeName){
 	//return queue of the vertices that are adjacent from vertex
+	return vertexQueue[verticeName].getAdjacentVertice();	
+	//return vertexQueue[verticeName].adjacentQueue;
 	},
 	clearMarks: function(){
-	//clear marks on vertices
+		for(var i = 0; i < vertexMeshArray.length; i++){
+			vertexMeshArray[i].material.emissiveColor = BABYLON.Color3.Blue();
+			vertexQueue[i].marked = false;
+		}
 	},
-	markVertex: function(vertexObject){
-	//sets mark for vertex to true
+	markVertex: function(verticeName){
+		vertexQueue[verticeName].setMark();
 	},
 	getUnmarked: function(){
 	//returns an unmarked vertex if any exist: otherwise, return null
+	},
+	isMark: function(verticeName){
+		return vertexQueue[verticeName].getMark();
 	}
 	
 
@@ -107,9 +138,10 @@ graphVertex.prototype.Create = function(scene, name, x, y){
 		
 		return scene;
 }
-
-
-var edgeCountArray = [];
+graphVertex.prototype.getMark = function(){
+	return this.marked;
+}
+var nodeCountArray = [];
 
 function addEdgeEvent(graphObject,mesh){
 	var defaultMaterial = new BABYLON.StandardMaterial("wallMat", scene);
@@ -119,8 +151,7 @@ function addEdgeEvent(graphObject,mesh){
 
 
 		var redMat = new BABYLON.StandardMaterial("wallMat", scene);
-    		redMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
-    		redMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+    		
  		redMat.emissiveColor = BABYLON.Color3.Red();		
 
 
@@ -130,32 +161,120 @@ function addEdgeEvent(graphObject,mesh){
 		
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
 		function(){
-			edgeCountArray.push(mesh);
+			switch(state){
+			case "addVertice":
+				//do nothing
+				break;
+			case "addEdge":
+				//add an edge to the vertices
+				nodeCountArray.push(mesh);
 			
-			if(edgeCountArray.length >= 2){
-			graphObject.addEdge(scene,edgeCountArray[0], edgeCountArray[1]);
-			for(var i = 0; i < edgeCountArray.length; i++){
-				edgeCountArray[i].material.emissiveColor = new BABYLON.Color3.Blue();;
+				if(nodeCountArray.length >= 2){
+					graphObject.addEdge(scene,nodeCountArray[0], nodeCountArray[1]);
+					for(var i = 0; i < nodeCountArray.length; i++){
+						nodeCountArray[i].material.emissiveColor = new BABYLON.Color3.Blue();;
 				//get positions
-				
+					}
+					nodeCountArray = [];
+					edgeCounter = 0;		
+				}
+				break;
+			case "bfs":
+				nodeCountArray.push(mesh);
+				if(nodeCountArray.length >= 1){
+					bfsPauseTest();
+				//get positions
+					nodeCountArray = [];
+					edgeCounter = 0;
+				}		
+				break;
 			}
-			edgeCountArray = [];
-			edgeCounter = 0;		
-
-		}
+			
 			}));
 }
 
 
-graphVertex.prototype.color = function(mesh){
+graphVertex.prototype.color = function(mesh, color){
 	//takes a mesh object and changes its color property
 	//sphereObject function call
+	mesh.material.emissiveColor = color;
 }
-graphVertex.prototype.marked = function(){
+graphVertex.prototype.setMark = function(){
 	//used Searches
 	//based on color return true or false
+	for(var i = 0; i < vertexMeshArray.length; i++){
+		if(vertexMeshArray[i].name == this.name){
+			vertexMeshArray[i].material.emissiveColor = new BABYLON.Color3.Red();
+		}
+	}
 	this.marked = true;	
 }
-addAdjacentVertex = function(vertex){
-	adjacentQueue.append(vertex);
+graphVertex.prototype.getAdjacentVertice = function(){
+	var newArray = [];
+	for (var i = 0 ; i < this.adjacentQueue.length; i++){
+		newArray.push(this.adjacentQueue[i]);
+	}
+	return newArray;
 };
+
+//normal bfs
+//
+
+var bfsTest = function(){
+	newGraphObject.clearMarks();
+	var queue = [];
+	newGraphObject.markVertex(nodeCountArray[0].name);
+	queue.push(vertexQueue[nodeCountArray[0].name]);
+	while(queue.length >0){
+		var v = queue.shift();
+		if(v != "undefined"){
+			console.log("Visited vertex: " + v.name);
+		}
+		
+		newGraphObject.getToVertices(v.name).forEach(function(entry){
+			if(!newGraphObject.isMark(entry)){
+				//mark edge
+				newGraphObject.markVertex(entry);
+				queue.push(vertexQueue[entry]);
+			}
+		});
+	}
+}
+
+
+//split the function up so it always the engine to update the scene
+var queue = [];
+var bfsPauseTest = function(){
+	newGraphObject.clearMarks();
+	
+	newGraphObject.markVertex(nodeCountArray[0].name);
+	queue.push(vertexQueue[nodeCountArray[0].name]);
+	bfsPauseTest_helper();
+	
+}
+
+var bfsPauseTest_helper = function(){
+	if(queue.length >0){
+		var v = queue.shift();
+		if(v != "undefined"){
+			v.color(vertexMeshArray[v.name], BABYLON.Color3.Green());
+			console.log("Visited vertex: " + v.name);
+		}
+		var newAdjArray = newGraphObject.getToVertices(v.name);
+		setTimeout(function(){loop(newAdjArray);}, 500);
+	}
+}
+
+function loop(newAdjArray){
+	if(newAdjArray.length != 0){
+			var checkVertex = newAdjArray.pop();
+			if(!newGraphObject.isMark(checkVertex)){
+				//mark edge
+				newGraphObject.markVertex(checkVertex);
+				queue.push(vertexQueue[checkVertex]);
+			}
+			setTimeout(function(){loop(newAdjArray);}, 500);
+	}
+	else{
+		setTimeout(function(){bfsPauseTest_helper();}, 500);}	
+}

@@ -44,6 +44,7 @@ FeelgoRhythm.prototype = {
 		this.initStandardMaterials();
 		this.initGround();
 		this.initDefaultLights();
+		this.initSkyBox();
 		
 
 	},
@@ -86,7 +87,18 @@ FeelgoRhythm.prototype = {
 	},
 
 	initSkyBox: function() {
-		//code here
+		var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
+		var skyboxMaterial = new BABYLON.StandardMaterial("skybox_mat", this.scene);
+		skyboxMaterial.backFaceCulling = false;
+		skybox.material = skyboxMaterial;
+		skybox.infiniteDistance = true;
+
+		skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+		skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+		skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox/clouds/clouds", this.scene);
+		skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+
 	},
 
 	initStandardMaterials: function() {

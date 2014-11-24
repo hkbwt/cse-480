@@ -123,14 +123,14 @@ FeelgoRhythm.prototype = {
 
 	initGraphScene: function() {
 
-		this.model = new GraphModel( this.scene, 10, this.currentTheme);
-		this.model.addEdgeByValues(1,2);
+		this.model = new GraphModel( this.scene, 0, this.currentTheme);
+		/*this.model.addEdgeByValues(1,2);
 		this.model.addEdgeByValues(5,2);
 		this.model.addEdgeByValues(3,2);
 		this.model.addEdgeByValues(5,1);
 		this.model.addEdgeByValues(3,1);
 		this.model.addEdgeByValues(0,9);
-		console.log(this.model);
+		console.log(this.model);*/
 	},
 	
 	dumpDebug: function() {
@@ -223,5 +223,62 @@ $( document ).ready( function() {
     		$(this).addClass('active');
     	}
     });
-
+    
+    //button actions for generic graph model
+    
+    //addVertices
+    $('#add_vertex').click(function() {
+    		app.model.graphState = "addVertice"; 
+    		 app.model.addVertex();
+    });
+    //remove vertices
+    $('#remove_vertex').click(function() {
+    		app.model.graphState = "removeVertice";
+    });
+    //edit?
+    $('#').click(function() {
+    		    
+    });
+    
+    //add edges
+    $('#add_edge').click(function() {
+    		 app.model.graphState = "addEdge";   
+    });
+    //remove edges
+    $('#remove_edge').click(function() {
+    		  app.model.graphState = "removeEdge"; 
+    });
+    //edit edges?
+    $('#').click(function() {
+    		    
+    });
+    //Clear graoh
+    $('#remove_all').click(function() {
+    		    app.model.removeAll();
+    		    app.model.graphState = "";
+    });
+    
+    //Run tab
+    
+    //bfsStartPoint
+      $('#bfs_start_point_graph').click(function() {
+      		    app.model.graphState = "bfs";
+    		    
+    });
+    
+     $('#Play_graph').click(function() {
+     		     app.model.graphState = "play";
+    		    app.model.playBFS();
+    });
+     $('#Pause_graph').click(function() {
+     		     app.model.graphState = "pause";
+    });
+     $('#Rewind_graph').click(function() {
+     		     app.model.graphState = "rewind";
+    		    app.model.playBFS();
+    });
+     $('#FastForward_graph').click(function() {
+     		     app.model.graphState = "forward";
+    		    app.model.playBFS();
+    });
 });

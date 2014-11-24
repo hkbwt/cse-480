@@ -11,14 +11,16 @@
 
 function Graph(vertCount) {
 	this.vertCount = vertCount;
-    this.edgeCount = 0;
-    this.adjList = [];
+	this.edgeCount = 0;
+	this.adjList = [];
+	this.vertexQueue = [];
+	
 
     //initialize starting values for each vertex
     this.valueList = [];
-    for (var i = 0; i < this.vertCount; i++) {
-        this.valueList.push(i);
-    }
+    //for (var i = 0; i < this.vertCount; i++) {
+    //    this.valueList.push(i);
+    //}
 
     //initialize starting adjacency lists
    // for(var i = 0; i < this.vertCount; i++){
@@ -49,23 +51,71 @@ Graph.prototype =  {
 
 	},
 
-    addEdge: function(v,w) {
+	addEdge: function(v,w) {
 
-	    this.adjList[v].push(w);
-	    this.adjList[w].push(v);
+	    //this.adjList[v].push(w);
+	    //this.adjList[w].push(v);
+	    this.vertexQueue[v].adjacentQueue.push(w);
+	    this.vertexQueue[w].adjacentQueue.push(v);
 	    this.edgeCount++;
+	    
+	    
     },
-    removeEdge: function(v){
-		
+   	 edgeExist: function(v,w){
+    	    for(var i = 0; i< this.vertexQueue.length; i++){
+			if(this.vertexQueue[i] == v){
+				for(var j = i; j< this.vertexQueue.length; j++){
+					if(this.vertexQueue[j] == w){
+						return true;	
+					}
+				}
+			}
+		}
+		return false;
+    },
+   	 removeEdge: function(v){
+		var vertice = this.getEdgeIdByName(v);
+		this.vertexQueue[vertice[0]].removeAdjacentVertex(vertice[1]);
+		this.vertexQueue[vertice[1]].removeAdjacentVertex(vertice[0]);
+		this.edgeCount--;
+	},
+	removeVertex: function(v){
+		var a = [];
+		for( var i = 0; i< this.vertexQueue.length; i++){
+			if(this.vertexQueue[i].name != this.getVertexIdByName(v)){
+				a.push(this.vertexQueue[i]);
+			}
+		}
+		this.vertexQueue = a;
+		this.vertCount--;
 	},
 
-    addVertex: function(value) {
-    	this.adjList.push([]);
-    	this.valueList.push(value);
-    	//this.VertCount++;
+	addVertex: function(value) {
+    	//this.adjList.push([]);
+    	//this.valueList.push(value);
+    	var a = new graphVertex(value, this.vertexQueue.length);
+    	this.vertexQueue.push(a);
+    	this.vertCount++;
     },
+   	 getToVertices: function(verticeName){
+    	    return this.vertexQueue[verticeName].getAdjacentVertice();
+    },
+   	 clearMarks: function(){
+		for(var i = 0; i < this.vertexQueue.length; i++){
+			
+			this.vertexQueue[i].marked = false;
+		}
+	},
+	markVertex: function(verticeName){
+		this.vertexQueue[verticeName].setMark();
+	},
+	isMark: function(verticeName){
+		return this.vertexQueue[verticeName].getMark();
+	},
+	
+    
 
-    printGraph: function() {
+	printGraph: function() {
 	    var msg = " ";
 
 	    for(var i = 0; i < this.vertCount; i++) {
@@ -83,4 +133,36 @@ Graph.prototype =  {
     }
 
 };
+
+
+var graphVertex = function(value, name){
+	this.marked = false;
+	this.value = value;
+	this.name = name;
+	this.adjacentQueue = [];
+	
+};
+
+//graphVertex.prototype = {//whatever contains the webgl creation methods.
+
+graphVertex.prototype.getMark = function(){
+	return this.marked;
+};
+
+graphVertex.prototype.setMark = function(){
+	this.marked = true;	
+};
+graphVertex.prototype.getAdjacentVertice = function(){
+	return this.adjacentQueue;
+};
+graphVertex.prototype.removeAdjacentVertex = function(w){
+	var a = []
+	for(var i = 0; i < this.adjacentQueue.length; i++){
+		if(this.adjacentQueue[i] != w){
+			a.push(this.adjacentQueue[i]);
+		}
+	}
+	this.adjacentQueue = a;
+};
+
 

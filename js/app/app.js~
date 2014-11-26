@@ -136,7 +136,6 @@ FeelgoRhythm.prototype = {
 	initGraphScene: function() {
 
 		this.model = new GraphModel( this.scene, 0, this.currentTheme);
-		this.model.initMoveFunction();
 		/*this.model.addEdgeByValues(1,2);
 		this.model.addEdgeByValues(5,2);
 		this.model.addEdgeByValues(3,2);

@@ -46,3 +46,23 @@ var Themes = {
 	Rainbowz: new ColorTheme('Rainbowz', 'blue', 'orange', 'yellow', 'red', 'green'),
 	Halloween: new ColorTheme('Halloween', 'black', 'orange', 'green', 'purple', 'white')
 };
+
+var SkyBoxThemes = {
+	alien: {name: "alien", path: "alien/alien"},
+	ashcanyon: {name: "ashcanyon", path: "ashcanyon/ashcanyon"},
+	bleached: {name: "bleached", path: "bleached/bleached" },
+	blood_sport: "blood_sport/blood_sport",
+	bluesky: "bluesky/bluesky",
+	calm: "calm/calm",
+	canyon: "canyon/canyon",
+	city: "city/city",
+	city2: "city2/city2",
+	cliffsofinsanity: "cliffsofinsanity/cliffsofinsanity",
+	clouds: "clouds/clouds",
+	moon: "moon/moon",
+	mountains: "mountains/mountains",
+	sky: "sky/sky",
+	space: "space/sky",
+	space2: "space2/space2",
+	tron: "tron/tron"
+};

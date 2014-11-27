@@ -410,7 +410,6 @@ GraphModel.prototype = {
 
 		for(var vertex = 0; vertex < vertexList.length; vertex++) {
 			var coord = this.getCirclePatternPosition(vertex);
-			console.log(coord);
 			vertexList[vertex].position = new BABYLON.Vector3(coord.x, 5, coord.y);
 		}
 
@@ -438,7 +437,7 @@ GraphModel.prototype = {
 		
 		//rate of change in the arch of the circle
 		var dtheta = 2 * Math.PI / (2 * nthcircle + 1);		
-		//angle of current circle
+		//current angle in the current circle
 		var theta =  positionInCircle * dtheta + thetaOffset;				
 		return this.getCircleCoords(radius, theta);
 	},

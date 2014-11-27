@@ -3,8 +3,6 @@
 *	"We want you to feel the algorithm"
 */
 
-
-var model;
 var FeelgoRhythm = function(documentId) {
 	
 	//old
@@ -15,6 +13,11 @@ var FeelgoRhythm = function(documentId) {
 	this.model = undefined;
 	this.currentTheme = Themes.Rainbowz;
 	var that = this;
+	this.skybox = undefined;
+	this.skyboxTexturePath = "textures/skybox/";
+	this.groundTexturePath = "textrues/ground/";
+	this.skyboxMaterialList = [];
+
 	this.engine.runRenderLoop(function(){
 		that.scene.render();});
 	window.addEventListener("resize", function () {
@@ -42,11 +45,11 @@ FeelgoRhythm.prototype = {
 	initScene: function() {
 		this.initCamera();
 		this.initStandardMaterials();
+		this.initSkyBoxMaterials();
 		this.initGround();
 		this.initDefaultLights();
-		this.initSkyBox();
-		
 
+		this.initSkyBox();
 	},
 
 	initGround: function() {
@@ -87,15 +90,18 @@ FeelgoRhythm.prototype = {
 	},
 
 	initSkyBox: function() {
-		var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
-		var skyboxMaterial = new BABYLON.StandardMaterial("skybox_mat", this.scene);
+		this.skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
 		skyboxMaterial.backFaceCulling = false;
 		skybox.material = skyboxMaterial;
 		skybox.infiniteDistance = true;
 
+	},
+
+	initSkyBoxMaterials: function() {
+
+		var skyboxMaterial = new BABYLON.StandardMaterial("skybox_mat", this.scene);
 		skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
 		skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-
 		skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox/clouds/clouds", this.scene);
 		skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
@@ -149,12 +155,10 @@ FeelgoRhythm.prototype = {
 	dumpDebug: function() {
 		console.log(this);
 	},
+
 	addNewScene: function() {
-		
 		console.log(this.scene);
-		console.log(test);
-		
-		
+		console.log(test);	
 	}
 	
 };
@@ -275,8 +279,11 @@ $( document ).ready( function() {
     		    app.model.organizeModel();
     		    app.model.graphState = "";
     });
+
+	/*Settings Menu*/
+
     
-    //Run tab
+    /*Run Code Menu*/
     
     //bfsStartPoint
       $('#bfs_start_point_graph').click(function() {

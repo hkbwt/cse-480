@@ -261,10 +261,7 @@ $( document ).ready( function() {
     $('#remove_edge').click(function() {
     		  app.model.graphState = "removeEdge"; 
     });
-    //edit edges?
-    $('#').click(function() {
-    		    
-    });
+    
     //Clear graoh
     $('#remove_all').click(function() {
     		    app.model.removeAll();

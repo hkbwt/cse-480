@@ -32,9 +32,9 @@ FeelgoRhythm.prototype = {
 					 new BABYLON.Vector3(0, 0, 0), this.scene);
 		
 		this.camera.lowerRadiusLimit = 20;
-		this.camera.upperRadiusLimit = 450;
+		this.camera.upperRadiusLimit = 550;
 		this.camera.upperBetaLimit = 0.483 * Math.PI;
-		this.camera.maxZ = 1500;
+		this.camera.maxZ = 2000;
 
 		this.camera.attachControl(this.canvas, false);
 	},
@@ -221,7 +221,10 @@ $( document ).ready( function() {
     	}
     	else {
     		$('.vertex_buttons').removeClass('active');
-    		$(this).addClass('active');
+    		if(!$(this).is("#add_vertex")) {
+    			$(this).addClass('active');
+    		}
+    		
     	}
     });
 
@@ -261,7 +264,7 @@ $( document ).ready( function() {
     $('#remove_edge').click(function() {
     		  app.model.graphState = "removeEdge"; 
     });
-    
+
     //Clear graoh
     $('#remove_all').click(function() {
     		    app.model.removeAll();

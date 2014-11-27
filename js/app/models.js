@@ -427,11 +427,7 @@ GraphModel.prototype = {
 			}
 		
 		}
-
-		console.log(nthcircle);
-		console.log(positionInCircle);
-
-
+		
 		var thetaOffset = ( Math.sqrt(3) / 2 ) * nthcircle;
 		//current circles radius
 
@@ -444,16 +440,6 @@ GraphModel.prototype = {
 		var dtheta = 2 * Math.PI / (2 * nthcircle + 1);		
 		//angle of current circle
 		var theta =  positionInCircle * dtheta + thetaOffset;				
-
-		console.log(thetaOffset);
-		console.log(radius);
-		console.log(dtheta);
-		console.log(theta);
-		console.log(Math.PI);
-
-
-
-
 		return this.getCircleCoords(radius, theta);
 	},
 

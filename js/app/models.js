@@ -25,7 +25,7 @@ function GraphModel (scene, vertices, theme, size) {
 	this.playBFSPosition = 0;
 	this.startingPoint;
 	this.currentMesh;
-	this.circlRadius =20.0;
+	this.circleRaidus =10.0;
 	that = this;
 
 	if(size == 'small') {
@@ -261,7 +261,7 @@ GraphModel.prototype = {
 	},
 
 	getGroundPosition: function () {
-        // Use a predicate to get position on the ground
+        	// Use a predicate to get position on the ground
         	var pickinfo = that.scene.pick(that.scene.pointerX, that.scene.pointerY, function (mesh) { return mesh == that.scene.meshes[0]; });
        		if (pickinfo.hit) {
        			return pickinfo.pickedPoint;
@@ -434,7 +434,12 @@ GraphModel.prototype = {
 
 		var thetaOffset = ( Math.sqrt(3) / 2 ) * nthcircle;
 		//current circles radius
-		var radius = nthcircle * this.circlRadius; 			
+
+		var radius = 0;
+		if(nthcircle > 0) {
+			radius = (this.circleRaidus * nthcircle * nthcircle) + nthcircle + this.circleRaidus;
+		}
+		
 		//rate of change in the arch of the circle
 		var dtheta = 2 * Math.PI / (2 * nthcircle + 1);		
 		//angle of current circle

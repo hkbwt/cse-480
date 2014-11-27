@@ -270,6 +270,11 @@ $( document ).ready( function() {
     		    app.model.removeAll();
     		    app.model.graphState = "";
     });
+
+    $('#orgainze_graph').click(function() {
+    		    app.model.organizeModel();
+    		    app.model.graphState = "";
+    });
     
     //Run tab
     

@@ -16,7 +16,6 @@
     <script type="text/javascript" src="./js/app/BFS.js"></script>
     <script type="text/javascript" src="./js/app/DFS.js"></script>
     <script type="text/javascript" src="./js/app/app.js"></script>
-    <script type="text/javascript" src="./js/app/ShortestPath.js"></script>
     
 
     <!-- sheetstyles  -->

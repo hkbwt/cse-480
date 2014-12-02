@@ -3,28 +3,33 @@
 *	"We want you to feel the algorithm"
 */
 
+var FeelgoRythm = function(documentId) {
+	var that = this;
 
-var model;
-var FeelgoRhythm = function(documentId) {
-	
-	//old
+	//main babylonjs componets
+	this.documentId = documentId;
 	this.canvas = document.getElementById(documentId);
 	this.engine = new BABYLON.Engine(this.canvas, true);
 	this.scene = new BABYLON.Scene(this.engine);
-	//this. hit mat 
+
+	//app variables
 	this.model = undefined;
-	this.currentTheme = Themes.Rainbowz;
-	var that = this;
-	this.engine.runRenderLoop(function(){
-		that.scene.render();});
+	this.currentGraphTheme = "Rainbowz";
+	this.currentSkybox = "alien";
+	this.currentGroundTheme = "cobble";
+	this.currentVertexSize = "medium";
+	this.bDisplayGraphValues = false;
+	this.bEnableTutorial = false;
+
+	this.skyboxTexturePath = "textures/skybox/";
+	this.groundTexturePath = "textures/ground/";
+
 	window.addEventListener("resize", function () {
-			//this.engine.resize();
 			that.engine.resize();	
-	});
-	
+	});	
 };
 
-FeelgoRhythm.prototype = {
+FeelgoRythm.prototype = {
 
 	initCamera: function() {
 		this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
@@ -40,16 +45,30 @@ FeelgoRhythm.prototype = {
 	},
 
 	initScene: function() {
-		this.initCamera();
-		this.initStandardMaterials();
-		this.initGround();
-		this.initDefaultLights();
-		this.initSkyBox();
+		this.loadGraphThemeMaterials();
+		this.loadSkyboxTextureThemes();
+		this.loadGroundThemes();
 		
+		this.initCamera();
+		this.initGround();
+		
+		this.initDefaultLights();
 
+		this.initSkyBox();
+
+		//resize loop for web browser
+		this.engine.runRenderLoop(function() {
+			that.scene.render();
+		});
+		
 	},
 
 	initGround: function() {
+		var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
+		ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
+	}, 
+
+	initTiledGroundGround: function() {
 
 		// Part 1 : Creation of Tiled Ground
 		// Parameters
@@ -58,16 +77,19 @@ FeelgoRhythm.prototype = {
 		var xmax =  500;
 		var zmax =  500;
 		var precision = {
-		    "w" : 2,
-		    "h" : 2
+		    "w" : 16,
+		    "h" : 16
 		};
 		var subdivisions = {
-		    'h' : 12,
-		    'w' : 12
+		    'h' : 4,
+		    'w' : 4
 		};
 
-		var tiledGround = new BABYLON.Mesh.CreateTiledGround("Tiled Ground", xmin, zmin, xmax, zmax, 
+		var tiledGround = new BABYLON.Mesh.CreateTiledGround("tiledGround", xmin, zmin, xmax, zmax, 
 															subdivisions, precision, this.scene);		 
+
+		//tiledGround.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
+
 
 		 tiledGround.material = this.scene.multiMaterials[0];
 		
@@ -87,31 +109,48 @@ FeelgoRhythm.prototype = {
 	},
 
 	initSkyBox: function() {
+
 		var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
-		var skyboxMaterial = new BABYLON.StandardMaterial("skybox_mat", this.scene);
-		skyboxMaterial.backFaceCulling = false;
-		skybox.material = skyboxMaterial;
+		skybox.material = this.scene.getMaterialByID("mat_" + this.currentSkybox);
 		skybox.infiniteDistance = true;
-
-		skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-		skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-
-		skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox/clouds/clouds", this.scene);
-		skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
 	},
 
-	initStandardMaterials: function() {
+	loadGraphThemeMaterials: function() {
 
-		for(var color in Palettes.Rainbowz) {
-			var mat = new BABYLON.StandardMaterial("Rainbowz_"+ color.toString(), this.scene);
-			mat.diffuseColor = Palettes.Rainbowz[color];
+		for(var theme = 0; theme < GraphThemes.length; theme++) {
+			var currTheme = GraphThemes[theme];
+			for(var color in Palettes[currTheme.name]) {
+				var mat = new BABYLON.StandardMaterial( currTheme.name + "_"+ color.toString(), this.scene);
+				mat.diffuseColor = Palettes[currTheme.name][color];
+			}
 		}
+	},
 
-		for(var color in Palettes.Halloween) {
-			var mat = new BABYLON.StandardMaterial("Halloween_"+ color.toString(), this.scene);
-			mat.diffuseColor = Palettes.Halloween[color];
-		} 
+	loadSkyboxTextureThemes: function() {
+		
+		for (var theme = 0; theme < SkyBoxThemes.length; theme++) {
+			var currSkyboxTexture = SkyBoxThemes[theme];
+			var skyboxMaterial = new BABYLON.StandardMaterial("mat_" + currSkyboxTexture.name, this.scene);
+			skyboxMaterial.backFaceCulling = false;
+
+			skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+			skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+			skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+											this.skyboxTexturePath + currSkyboxTexture.path, this.scene);
+
+			skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+
+		};
+	},
+
+	loadGroundThemes: function() {
+		for (var theme = 0; theme < GroundThemes.length; theme++) {
+			var currGroundTheme = GroundThemes[theme];
+			var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
+			groundMaterial.diffuseTexture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
+		}
 
 
 		var whiteMaterial = new BABYLON.StandardMaterial("ground_white", this.scene);
@@ -134,39 +173,56 @@ FeelgoRhythm.prototype = {
 	},
 
 	initGraphScene: function() {
-
-		this.model = new GraphModel( this.scene, 0, this.currentTheme);
+		var index = this.getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
+		this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
 		this.model.initMoveFunction();
-		/*this.model.addEdgeByValues(1,2);
-		this.model.addEdgeByValues(5,2);
-		this.model.addEdgeByValues(3,2);
-		this.model.addEdgeByValues(5,1);
-		this.model.addEdgeByValues(3,1);
-		this.model.addEdgeByValues(0,9);
-		console.log(this.model);*/
+	},
+
+	updateSkybox: function(index) {
+		var newSkyBoxTheme = SkyBoxThemes[index];
+		var skyboxMesh = this.scene.getMeshByName("skybox");
+		skyboxMesh.material = this.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
+	},
+
+	updateGround: function(index) {
+		console.log(index);
+
+
+		var newGroundTheme = GroundThemes[index];
+		console.log(newGroundTheme);
+
+		var groundMesh = this.scene.getMeshByName("ground");
+		console.log(this.scene.getMaterialByID("mat_" + newGroundTheme.name));
+		groundMesh.material = this.scene.getMaterialByID("mat_" + newGroundTheme.name);
 	},
 	
 	dumpDebug: function() {
 		console.log(this);
 	},
-	addNewScene: function() {
-		
-		console.log(this.scene);
-		console.log(test);
-		
-		
+
+	getIndexOfObjectArray: function(name, objArray){
+		for(var i = 0; i < objArray.length; i++) {
+				if(objArray[i].name == name) return i;
+		}
+		return -1;
 	}
 	
 };
+
+
 var app;
 /*main function*/
 $( document ).ready( function() {
-	//var app
-	app = new FeelgoRhythm('renderCanvas');
+
+	app = new FeelgoRythm('renderCanvas');
 	app.initScene();
-	app.initGraphScene();
+	app.initGraphScene();	
 	/*Menu Tabs*/
 
+	$('.accordion').accordion();
+	$('.dropdown').dropdown();
+	$('.ui.checkbox').checkbox();
+	
 	$('.app_menu').click( function() {
 
 		if (this.id == 'btn_model' ) {
@@ -276,8 +332,58 @@ $( document ).ready( function() {
     		    app.model.organizeModel();
     		    app.model.graphState = "";
     });
-    
-    //Run tab
+
+	/*Settings Menu*/
+
+	//setup Skybox dropdown box
+	for(var i = 0; i < SkyBoxThemes.length; i++) {
+		$('#dd_skybox .menu').append("<div class='item' data-value='" + i + "'>" + SkyBoxThemes[i].name + " </div>");
+
+	}
+
+	for(var i = 0; i < GroundThemes.length; i++) {
+		$('#dd_groundTexture .menu').append("<div class='item' data-value='" + i + "'>" + GroundThemes[i].name + " </div>");
+
+	}
+
+	for(var i = 0; i < GraphThemes.length; i++) {
+		$('#dd_graphThemes .menu').append("<div class='item' data-value='" + i + "'>" + GraphThemes[i].name + " </div>");
+
+	}
+
+	$('#dd_skybox').dropdown();
+	$('#dd_skybox').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentSkybox, SkyBoxThemes).toString());
+	
+	$('#dd_vertexSize').dropdown( 'set selected',app.currentVertexSize.toString());
+
+	$('#dd_groundTexture').dropdown();
+	$('#dd_groundTexture').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGroundTheme, GroundThemes).toString());
+
+    $('#dd_graphThemes').dropdown();
+    $('#dd_graphThemes').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGraphTheme, GraphThemes).toString());
+
+    $('#btn_settings_apply').click(function() {
+    	app.updateSkybox($("#dd_skybox").dropdown("get value") );
+    	app.model.updateModelSize($("#dd_vertexSize").dropdown("get value"));
+    	app.updateGround($("#dd_groundTexture").dropdown("get value"));
+    	/*app.model.updateModelTheme();
+    	app.updateDisplayGraphValues();
+    	app.updateEnableTutorial(); */
+    });
+
+    $('#btn_settings_cancel').click(function() {
+    	$('#dd_skybox').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentSkybox, SkyBoxThemes).toString());
+    	$('#dd_vertexSize').dropdown( 'set selected',app.currentVertexSize.toString());
+    	$('#dd_groundTexture').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGroundTheme, GroundThemes).toString());
+    	$('#dd_graphThemes').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGraphTheme, GraphThemes).toString());
+    });
+
+    $('#btn_debug').click(function() {
+    	app.dumpDebug();
+    });
+
+
+    /*Run Code Menu*/
     
     //bfsStartPoint
       $('#bfs_start_point_graph').click(function() {

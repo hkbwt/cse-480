@@ -28,20 +28,6 @@ function GraphModel (scene, vertices, theme, size) {
 	this.circleRaidus =10.0;
 	that = this;
 
-	if(size == 'small') {
-		this.meshSize = 3.0;
-		this.meshSegments = 3.0;
-	}
-	else if (size == 'medium') {
-		this.meshSize = 6.0;
-		this.meshSegments = 6.0;
-	}
-	else if (size == 'large') {
-		this.meshSize = 10.0;
-		this.meshSegments = 10.0;
-	}
-
-
 	this.init();
 }
 
@@ -51,6 +37,24 @@ GraphModel.prototype = {
 
 		//print something pretty to the console
 		console.log("0_0!");
+	},
+
+	getSizeByName: function(size) {
+
+		if(size == 'small') {
+			this.meshSize = 6.0;
+			this.meshSegments = 6.0;
+		}
+		else if (size == 'medium') {
+			this.meshSize = 10.0;
+			this.meshSegments = 10.0;
+		}
+		else if (size == 'large') {
+			this.meshSize = 15.0;
+			this.meshSegments = 10.0;
+		}
+
+
 	},
 	
 	addEdgeByValues: function(v, w) {
@@ -135,7 +139,7 @@ GraphModel.prototype = {
 		}));
 	},
 
-	addVertex: function(value, position){
+	addVertex: function(value){
 		if(typeof(value) =="undefined" && typeof(this.graph.vertCount) == "undefined"){
 			value = 0;
 		}
@@ -143,24 +147,20 @@ GraphModel.prototype = {
 			value = this.graph.vertCount;
 		}
 		
-		if(typeof(position) =="undefined" && typeof(this.graph.vertCount) == "undefined"){
-			position = 0;
-		}
-		else{
-			position = [this.graph.vertCount,this.graph.vertCount,this.graph.vertCount];
-		}
+		var coord = this.getCirclePatternPosition(this.graph.vertCount);
+
 		this.graph.addVertex(value);
-		var defaultMaterial = new BABYLON.StandardMaterial("wallMat", this.scene);
+
 		var vertex = BABYLON.Mesh.CreateSphere(this.graph.getVertexNameById(value), 
 					this.meshSegments, this.meshSize, this.scene);
-		vertex.position = position;
-		//vertex.setMaterialByID(this.theme.vertexMat);
-		//defaultMaterial.emissiveColor = this.scene.getMaterialByID(this.theme.activeMatOne).diffuseColor;
+		
+		vertex.position = new BABYLON.Vector3(coord.x, this.meshSize + 5, coord.y);
 		vertex.material = this.scene.getMaterialByID(this.theme.vertexMat);
+		
 		this.addVertexClickEvent(vertex);
+		
 		BABYLON.Tags.EnableFor(vertex);
 		vertex.addTags("vertex");
-		this.organizeModel();
 	},
 	
 	addVertexClickEvent: function( mesh){
@@ -408,9 +408,9 @@ GraphModel.prototype = {
 
 		var vertexList = this.scene.getMeshesByTags("vertex");
 
-		for(var vertex = 0; vertex < vertexList.length; vertex++) {
-			var coord = this.getCirclePatternPosition(vertex);
-			vertexList[vertex].position = new BABYLON.Vector3(coord.x, 5, coord.y);
+		for(var vertexCount = 0; vertexCount < vertexList.length; vertexCount++) {
+			var coord = this.getCirclePatternPosition(vertexCount);
+			vertexList[vertexCount].position = new BABYLON.Vector3(coord.x, this.meshSize + 5, coord.y);
 		}
 
 	},
@@ -459,6 +459,29 @@ GraphModel.prototype = {
 		
 		for(var i = 0; i< randVertices; i++){
 			this.addVertex(i,new BABYLON.Vector3(Math.cos(i * (2 /(4 * Math.PI))))*(Math.pow(Math.E,(i * (2 /(4 * Math.PI))))) ,5 ,(Math.sin(i * (2 /(4 * Math.PI))))*(Math.pow(Math.E,(i * (2/(4 * Math.PI))))));
+		}
+	},
+
+	updateModelSize: function(size) {
+		var vertexList = this.scene.getMeshesByTags("vertex");
+		this.getSizeByName(size);
+
+		for (var vertexCount = 0; vertexCount < vertexList.length; vertexCount++) {
+			var oldVertex = vertexList[vertexCount];
+
+			var vertex = BABYLON.Mesh.CreateSphere(oldVertex.name, 
+						this.meshSegments, this.meshSize, this.scene);
+
+			vertex.material = this.scene.getMaterialByID(oldVertex.material.name);
+			vertex.position = new BABYLON.Vector3(oldVertex.position.x, oldVertex.position.y, oldVertex.position.z);
+
+			oldVertex.dispose();
+
+			this.addVertexClickEvent(vertex);
+
+			BABYLON.Tags.EnableFor(vertex);
+			vertex.addTags("vertex");
+
 		}
 	}
 };

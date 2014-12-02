@@ -93,7 +93,10 @@ Graph.prototype =  {
 	addVertex: function(value) {
     	//this.adjList.push([]);
     	//this.valueList.push(value);
-    	var a = new graphVertex(value, this.vertexQueue.length);
+    	if(typeof(value) == "undefined"){
+    		value = this.vertexQueue.length;
+    	}
+    	var a = new graphVertex(value, this.getVertexNameById(this.vertexQueue.length));
     	this.vertexQueue.push(a);
     	this.vertCount++;
     },

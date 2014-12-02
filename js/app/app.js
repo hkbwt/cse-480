@@ -252,8 +252,9 @@ $( document ).ready( function() {
     		app.model.graphState = "removeVertice";
     });
     //edit?
-    $('#').click(function() {
-    		    
+    $('#edit_vertex').click(function() {
+     		     app.model.graphState = "edit";
+    		    app.model.play();
     });
     
     //add edges
@@ -280,23 +281,43 @@ $( document ).ready( function() {
     
     //bfsStartPoint
       $('#bfs_start_point_graph').click(function() {
+      		      app.model.algoSelected = "bfs";
       		    app.model.graphState = "bfs";
+    		    
+    });
+      $('#dfs_start_point_graph').click(function() {
+      		    app.model.algoSelected = "dfs";
+      		    app.model.graphState = "dfs";
+    		    
+    });
+      
+      $('#short_start_point_graph').click(function() {
+      		    app.model.algoSelected = "short";
+      		    app.model.graphState = "short";
     		    
     });
     
      $('#Play_graph').click(function() {
      		     app.model.graphState = "play";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
      $('#Pause_graph').click(function() {
      		     app.model.graphState = "pause";
     });
      $('#Rewind_graph').click(function() {
      		     app.model.graphState = "rewind";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
      $('#FastForward_graph').click(function() {
      		     app.model.graphState = "forward";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
+     $('#selectAlgo').dropdown();
+     $('#selectAlgo').dropdown( 'set selected', 'Breadth First Search');
+     
+    //TextArea Formating
+    var textArea = document.getElementById('algoArea');
+    var TextArea = new algoArea(textArea);
+    TextArea.createArea();
+    $(textArea).prop('readonly', true);
 });

@@ -101,7 +101,7 @@ Graph.prototype =  {
     	this.vertCount++;
     },
    	 getToVertices: function(verticeName){
-    	    return this.vertexQueue[verticeName].getAdjacentVertice();
+    	    return this.vertexQueue[this.getVertexIdByName(verticeName)].getAdjacentVertice();
     },
    	 clearMarks: function(){
 		for(var i = 0; i < this.vertexQueue.length; i++){

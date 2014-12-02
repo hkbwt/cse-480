@@ -21,8 +21,9 @@ function GraphModel (scene, vertices, theme, size) {
 	this.scene = scene;									// the scene the graph belongs to
 	this.meshSize = 5.0;								// vertex size
 	this.meshSegments = 5.0;							// number of vertex model segments
-	this.bfsFrames;										
-	this.playBFSPosition = 0;
+	this.algoFrames;
+	this.algoSelected;
+	this.playPosition = 0;
 	this.startingPoint;
 	this.currentMesh;
 	this.circleRaidus =10.0;
@@ -192,21 +193,42 @@ GraphModel.prototype = {
 			case "bfs":
 				mesh.material = that.scene.getMaterialByID(that.theme.activeMatOne);
 				that.nodeCountArray.push(mesh);
-				that.playBFSPosition = 0;
+				that.playPosition = 0;
 				if(that.nodeCountArray.length >= 1){
 					var that2 = that;
-					var n = new runBFS(that.graph, that, that.scene);
-					that2.bfsFrames = n.bfsTest(that2.graph.getVertexIdByName(that2.nodeCountArray[0].name));
+					var n = new runBFS(that2.graph, that2, that2.scene);
+					that2.algoFrames = n.bfsTest(that2.graph.getVertexIdByName(that2.nodeCountArray[0].name));
+					//that = that2;
+					that.nodeCountArray = [];
+				}		
+				break;
+			case "short":
+				mesh.material = that.scene.getMaterialByID(that.theme.activeMatOne);
+				that.nodeCountArray.push(mesh);
+				that.playPosition = 0;
+				if(that.nodeCountArray.length >= 2){
+					var that2 = that;
+					var n = new ShortestPathBFS(that.graph, that, that.scene);
+					that2.algoFrames = n.runShortestPath(that2.graph.getVertexIdByName(that2.nodeCountArray[0].name),that2.graph.getVertexIdByName(that2.nodeCountArray[1].name));
 					that = that2;
 					that.nodeCountArray = [];
 				}		
 				break;
-			case "shortest path":
-				break;
 			case "dfs":
+				mesh.material = that.scene.getMaterialByID(that.theme.activeMatOne);
+				that.nodeCountArray.push(mesh);
+				that.playPosition = 0;
+				if(that.nodeCountArray.length >= 1){
+					var that2 = that;
+					var n = new DFS(that2.graph, that, that.scene);
+					that2.algoFrames = n.runDFS(that2.graph.getVertexIdByName(that2.nodeCountArray[0].name));
+					that = that2;
+					that.nodeCountArray = [];
+				}		
 				break;
 			}
 			})); 
+		
 	},
 
 	removeEdge: function(name) {
@@ -369,13 +391,36 @@ GraphModel.prototype = {
 		}		
 	},
 
-	playBFS: function(){
-		switch(this.graphState){
+	
+	play: function(initCodeScene){
+		var n;
+		that2 = that;
+		switch(this.algoSelected)
+		{
+		case "bfs":
+			n = new runBFS();
+			break;
+		case "dfs":
+			n = new DFS()
+			break;
+		case "short":
+			n = new ShortestPathBFS();
+			break;
+		}
+		var Area = new algoArea(initCodeScene);
+		Area.setText(n.getStringVersion)
+		that = that2;
+		that.play_helper(Area);
+		
+	},
+	play_helper: function(Area){
+	switch(this.graphState){
 		case "play":
-			if(this.playBFSPosition < this.bfsFrames.length){
-			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
-			 this.playBFSPosition++;
-			 setTimeout(function(){that.playBFS();}, 500);
+			if(this.playPosition < this.algoFrames.length){
+			 this.scene = this.algoFrames[this.playPosition].createScene();
+			 Area.selectLine(this.algoFrames[this.playPosition].currentState);
+			 this.playPosition++;
+			 setTimeout(function(){that.play_helper(Area);}, 500);
 			}
 			else{;
 				this.graphState = "end";
@@ -384,19 +429,21 @@ GraphModel.prototype = {
 		case "pause":
 			break;
 		case "rewind":
-			if(this.playBFSPosition > 0){
-				this.playBFSPosition--;	
+			if(this.playPosition > 0){
+				this.playPosition--;	
 			}
-			if(this.playBFSPosition < this.bfsFrames.length){
-			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
+			if(this.playPosition < this.algoFrames.length){
+			 this.scene = this.algoFrames[this.playPosition].createScene();
+			 Area.selectLine(this.algoFrames[this.playPosition].currentState);
 			}
 			break;
 		case "forward":
-			if(this.playBFSPosition < this.bfsFrames.length){
-				this.playBFSPosition++;	
+			if(this.playPosition < this.algoFrames.length){
+				this.playPosition++;	
 			}
-			if(this.playBFSPosition < this.bfsFrames.length){
-			 this.scene = this.bfsFrames[this.playBFSPosition].createScene();
+			if(this.playPosition < this.algoFrames.length){
+			 this.scene = this.algoFrames[this.playPosition].createScene();
+			 Area.selectLine(this.algoFrames[this.playPosition].currentState);
 			}
 			break;
 		case "end":

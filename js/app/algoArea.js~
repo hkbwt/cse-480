@@ -1,0 +1,41 @@
+var algoArea = function(algoID){
+	this.algoID = algoID;
+	that = this;
+}
+
+algoArea.prototype = {
+	createArea: function(){
+		$(function(){
+				$(that.algoID).linedtextarea(
+						{selectedLine: 1}
+						);
+			});
+	},
+	selectLine: function(lineNum){
+		lineNum--;
+		var lines = that.algoID.value.split("\n");
+		
+		var startPos = 0, endPos = that.algoID.value.length;
+		for(var x = 0; x < lines.length; x++){
+			if(x == lineNum){
+				break;
+			}
+			startPos += (lines[x].length+1);
+		}
+		endPos = lines[lineNum].length+ startPos;
+		
+		if(typeof(that.algoID.selectionStart) != "undefined") {
+		that.algoID.focus();
+		that.algoID.selectionStart = startPos;
+		that.algoID.selectionEnd = endPos;
+		return true;
+		}
+		else{
+			return false;
+		}
+
+	},
+	setText: function(text){
+		$(that.algoID).val(text); 
+	}
+}

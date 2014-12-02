@@ -36,6 +36,3 @@ body{
 .ui.teal.buttons .active.button {
 	background-color: #2952CC;
 }
-#algoArea {
-	width:98%;
-}

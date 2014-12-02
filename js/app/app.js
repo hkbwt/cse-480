@@ -32,9 +32,9 @@ FeelgoRhythm.prototype = {
 					 new BABYLON.Vector3(0, 0, 0), this.scene);
 		
 		this.camera.lowerRadiusLimit = 20;
-		this.camera.upperRadiusLimit = 450;
+		this.camera.upperRadiusLimit = 550;
 		this.camera.upperBetaLimit = 0.483 * Math.PI;
-		this.camera.maxZ = 1500;
+		this.camera.maxZ = 2000;
 
 		this.camera.attachControl(this.canvas, false);
 	},
@@ -221,7 +221,10 @@ $( document ).ready( function() {
     	}
     	else {
     		$('.vertex_buttons').removeClass('active');
-    		$(this).addClass('active');
+    		if(!$(this).is("#add_vertex")) {
+    			$(this).addClass('active');
+    		}
+    		
     	}
     });
 
@@ -249,8 +252,9 @@ $( document ).ready( function() {
     		app.model.graphState = "removeVertice";
     });
     //edit?
-    $('#').click(function() {
-    		    
+    $('#edit_vertex').click(function() {
+     		     app.model.graphState = "edit";
+    		    app.model.play();
     });
     
     //add edges
@@ -261,13 +265,15 @@ $( document ).ready( function() {
     $('#remove_edge').click(function() {
     		  app.model.graphState = "removeEdge"; 
     });
-    //edit edges?
-    $('#').click(function() {
-    		    
-    });
+
     //Clear graoh
     $('#remove_all').click(function() {
     		    app.model.removeAll();
+    		    app.model.graphState = "";
+    });
+
+    $('#orgainze_graph').click(function() {
+    		    app.model.organizeModel();
     		    app.model.graphState = "";
     });
     
@@ -275,23 +281,43 @@ $( document ).ready( function() {
     
     //bfsStartPoint
       $('#bfs_start_point_graph').click(function() {
+      		      app.model.algoSelected = "bfs";
       		    app.model.graphState = "bfs";
+    		    
+    });
+      $('#dfs_start_point_graph').click(function() {
+      		    app.model.algoSelected = "dfs";
+      		    app.model.graphState = "dfs";
+    		    
+    });
+      
+      $('#short_start_point_graph').click(function() {
+      		    app.model.algoSelected = "short";
+      		    app.model.graphState = "short";
     		    
     });
     
      $('#Play_graph').click(function() {
      		     app.model.graphState = "play";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
      $('#Pause_graph').click(function() {
      		     app.model.graphState = "pause";
     });
      $('#Rewind_graph').click(function() {
      		     app.model.graphState = "rewind";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
      $('#FastForward_graph').click(function() {
      		     app.model.graphState = "forward";
-    		    app.model.playBFS();
+    		    app.model.play(document.getElementById('algoArea'));
     });
+     $('#selectAlgo').dropdown();
+     $('#selectAlgo').dropdown( 'set selected', 'Breadth First Search');
+     
+    //TextArea Formating
+    var textArea = document.getElementById('algoArea');
+    var TextArea = new algoArea(textArea);
+    TextArea.createArea();
+    $(textArea).prop('readonly', true);
 });

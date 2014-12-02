@@ -16,6 +16,7 @@
     <script type="text/javascript" src="./js/app/BFS.js"></script>
     <script type="text/javascript" src="./js/app/DFS.js"></script>
     <script type="text/javascript" src="./js/app/app.js"></script>
+    <script type="text/javascript" src="./js/app/ShortestPath.js"></script>
     
 
     <!-- sheetstyles  -->
@@ -83,7 +84,6 @@
             </div>
         </div>
 
-
         <div class="item">
             <div class="header item">
                 <i class="resize full icon"></i>
@@ -92,37 +92,31 @@
         </div>
 
         <div class="item">
-            <div class="3 fluid teal ui buttons">
+            <div class="2 fluid teal ui buttons">
                 <div id="add_edge" class="ui button edge_buttons">Add</div>
                 <div id="remove_edge" class="ui button edge_buttons">Remove</div>
-                <div id="edit_edge" class="ui button edge_buttons">Edit</div>
             </div>
         </div>
 
-        
         <div class="item">
             <div class="header item">
                 <i class="globe icon"></i>
                     Graph
             </div>
         </div>
-        
-        <div class="item">
-            <div class="header item">
-                <i class="trash icon"></i>
-                    Clear Graph
-            </div>
-        </div>
-        
+
         <div class="item">
             <div class="1 fluid teal ui buttons">
-                <div id="remove_all" class="ui button edge_buttons">Remove All</div>
+                <div id="remove_all" class="ui button">Clear Graph</div>
             </div>
         </div>
-        
-        
+
+        <div class="item">
+            <div class="1 fluid teal ui buttons">
+                <div id="orgainze_graph" class="ui button">Organize Graph</div>
+            </div>
+        </div>
     </div>
-    
     
     <!-- settings menu  -->
 
@@ -138,31 +132,29 @@
 
     <div id="code_menu" class="ui right very wide sidebar vertical menu"> 
         <div class="item">
-
-        <div class="item">
             <div class="header item">
                 <i class="gamepad icon"></i>
                     Run through Graph
             </div>
         </div>
-        
-        <div class="1 fluid teal ui buttons">
-        	 <div id="bfs_start_point_graph" class="ui button edge_buttons">Select BFS Start Point</div>
-        	</div>
+
         <div class="item">
-        	
-            <div class="4 fluid teal ui buttons">
+            <div class="fluid blue ui buttons">
+                 <div id="bfs_start_point_graph" class="ui button edge_buttons">
+                 Select BFS Start Point
+                 </div>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="4 fluid blue ui buttons">
                 <div id="Rewind_graph" class="ui button edge_buttons"><i class="backward icon"></i></div>
             	<div id="Play_graph" class="ui button edge_buttons"><i class="play icon"></i></div>
                 <div id="Pause_graph" class="ui button edge_buttons"><i class="pause icon"></i></div>
-                <div id="FastForward_graph" class="ui button edge_buttons"><i class="forward icon"></i></div>
-                
+                <div id="FastForward_graph" class="ui button edge_buttons"><i class="forward icon"></i></div>       
             </div>
-        
-        
         </div>
     </div>
-
     <!-- main menu  -->
 
     </body>

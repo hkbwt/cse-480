@@ -8,7 +8,8 @@
     <script type="text/javascript" src="./js/vendor/semantic.min.js"></script>
     <script type="text/javascript" src="./js/vendor/babylon.1.13.js"></script>
     <script type="text/javascript" src="./js/vendor/hand.minified-1.3.8.js"></script>
-
+    <script src="./js/vendor/jquery-linedtextarea.js"></script>
+    
     <!-- application js files  -->
     <script type="text/javascript" src="./js/app/palettes.js"></script>
     <script type="text/javascript" src="./js/app/adt.js"></script>
@@ -17,11 +18,13 @@
     <script type="text/javascript" src="./js/app/DFS.js"></script>
     <script type="text/javascript" src="./js/app/app.js"></script>
     <script type="text/javascript" src="./js/app/ShortestPath.js"></script>
+    <script type="text/javascript" src="./js/app/ShortestPath.js"></script>
+    <script src="./js/app/algoArea.js"></script>
     
-
     <!-- sheetstyles  -->
     <link rel="stylesheet" type="text/css" href="./css/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="./css/app.css">
+    <link rel="stylesheet" type="text/css" href="./css/jquery-linedtextarea.css">
     </head>
 
     <body>
@@ -84,7 +87,6 @@
             </div>
         </div>
 
-
         <div class="item">
             <div class="header item">
                 <i class="resize full icon"></i>
@@ -93,37 +95,31 @@
         </div>
 
         <div class="item">
-            <div class="3 fluid teal ui buttons">
+            <div class="2 fluid teal ui buttons">
                 <div id="add_edge" class="ui button edge_buttons">Add</div>
                 <div id="remove_edge" class="ui button edge_buttons">Remove</div>
-                <div id="edit_edge" class="ui button edge_buttons">Edit</div>
             </div>
         </div>
 
-        
         <div class="item">
             <div class="header item">
                 <i class="globe icon"></i>
                     Graph
             </div>
         </div>
-        
-        <div class="item">
-            <div class="header item">
-                <i class="trash icon"></i>
-                    Clear Graph
-            </div>
-        </div>
-        
+
         <div class="item">
             <div class="1 fluid teal ui buttons">
-                <div id="remove_all" class="ui button edge_buttons">Remove All</div>
+                <div id="remove_all" class="ui button">Clear Graph</div>
             </div>
         </div>
-        
-        
+
+        <div class="item">
+            <div class="1 fluid teal ui buttons">
+                <div id="orgainze_graph" class="ui button">Organize Graph</div>
+            </div>
+        </div>
     </div>
-    
     
     <!-- settings menu  -->
 
@@ -139,31 +135,57 @@
 
     <div id="code_menu" class="ui right very wide sidebar vertical menu"> 
         <div class="item">
-
-        <div class="item">
             <div class="header item">
                 <i class="gamepad icon"></i>
-                    Run through Graph
+                    Select Algorithm
             </div>
         </div>
         
-        <div class="1 fluid teal ui buttons">
-        	 <div id="bfs_start_point_graph" class="ui button edge_buttons">Select BFS Start Point</div>
-        	</div>
+        <div id="selectAlgo" class="ui fluid selection dropdown active visible">
+            <input type="hidden" name="selectAlgo">
+            <div class="text">breadth first search</div>
+            <i class="dropdown icon"></i>
+            <div class="menu ui transition visible"> <div class="item active" data-value="0">Breadth First Search</div><div class="item" data-value="1">Depth First Search</div><div class="item" data-value="2">Shortest Path</div></div>
+        </div>
+        
         <div class="item">
-        	
-            <div class="4 fluid teal ui buttons">
+            <div class="fluid blue ui buttons">
+                 <div id="bfs_start_point_graph" class="ui button edge_buttons">
+                 Select BFS Start Point
+                 </div>
+            </div>
+        </div>
+         <div class="item">
+            <div class="fluid blue ui buttons">
+                 <div id="dfs_start_point_graph" class="ui button edge_buttons">
+                 Select DFS Start Point
+                 </div>
+            </div>
+        </div>
+         <div class="item">
+            <div class="fluid blue ui buttons">
+                 <div id="short_start_point_graph" class="ui button edge_buttons">
+                 Select a Start and End Point
+                 </div>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="4 fluid blue ui buttons">
                 <div id="Rewind_graph" class="ui button edge_buttons"><i class="backward icon"></i></div>
             	<div id="Play_graph" class="ui button edge_buttons"><i class="play icon"></i></div>
                 <div id="Pause_graph" class="ui button edge_buttons"><i class="pause icon"></i></div>
-                <div id="FastForward_graph" class="ui button edge_buttons"><i class="forward icon"></i></div>
-                
+                <div id="FastForward_graph" class="ui button edge_buttons"><i class="forward icon"></i></div>       
             </div>
-        
-        
+        </div>
+        <div class="item">
+        	<div>
+        		<textarea id="algoArea" class ="lined" rows="30" col="30">
+        			
+        		</textarea>
+        	</div>
         </div>
     </div>
-
     <!-- main menu  -->
 
     </body>

@@ -49,20 +49,10 @@ var GraphThemes = [
 
 var SkyBoxThemes = [
 	{name: "alien", path: "alien/alien"},
-	{name: "ashcanyon", path: "ashcanyon/ashcanyon"},
-	{name: "bleached", path: "bleached/bleached" },
 	{name: "blood_sport", path: "blood_sport/blood_sport" },
-	{name: "bluesky", path: "bluesky/bluesky"},
 	{name: "calm",path: "calm/calm"},
 	{name: "canyon",path: "canyon/canyon"},
-	{name: "city",path: "city/city"},
-	{name: "city2", path: "city2/city2"},
-	{name: "cliffsofinsanity", path: "cliffsofinsanity/cliffsofinsanity"},
-	{name: "clouds",path: "clouds/clouds"},
 	{name:"moon", path: "moon/moon"},
-	{name: "mountains", path: "mountains/mountains"},
-	{name: "sky",path:"sky/sky"},
-	{name: "space",path: "space/sky"},
 	{name: "space2",path: "space2/space2"},
 	{name: "tron",path: "tron/tron"}
 ];
@@ -72,9 +62,4 @@ var GroundThemes = [
 	{name: "blue_brick", filename: "blue_brick.jpg"},
 	{name: "grey_brick", filename: "grey_brick.jpg"},
 	{name: "red_brick", filename: "red_brick.jpg"},
-	{name: "dry_wood", filename: "dry_wood.jpg"},
-	{name: "cobble", filename: "cobble.jpg"},
-	{name: "grass_and_daysies", filename: "grass_and_daysies.jpg"},
-	{name: "water", filename: "water.jpg"},
-	{name: "white_wall", filename: "white_wall.jpg"}
 ];

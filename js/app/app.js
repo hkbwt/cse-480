@@ -1,429 +1,300 @@
+// initializes the html and handles calls from the user interface
+// to the feelgorythm object
 
-/*
-*	"We want you to feel the algorithm"
-*/
+function App(canvasId) {
+	this._canvasId = canvasId;
+	this.feel = undefined;
+}
 
-var FeelgoRythm = function(documentId) {
-	var that = this;
+App.prototype = {
 
-	//main babylonjs componets
-	this.documentId = documentId;
-	this.canvas = document.getElementById(documentId);
-	this.engine = new BABYLON.Engine(this.canvas, true);
-	this.scene = new BABYLON.Scene(this.engine);
-
-	//app variables
-	this.model = undefined;
-	this.currentGraphTheme = "Rainbowz";
-	this.currentSkybox = "alien";
-	this.currentGroundTheme = "cobble";
-	this.currentVertexSize = "medium";
-	this.bDisplayGraphValues = false;
-	this.bEnableTutorial = false;
-
-	this.skyboxTexturePath = "textures/skybox/";
-	this.groundTexturePath = "textures/ground/";
-
-	window.addEventListener("resize", function () {
-			that.engine.resize();	
-	});	
-};
-
-FeelgoRythm.prototype = {
-
-	initCamera: function() {
-		this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
-					 1.5319001498871874, 1.3278950757638162, 180.04261169410753,
-					 new BABYLON.Vector3(0, 0, 0), this.scene);
-		
-		this.camera.lowerRadiusLimit = 20;
-		this.camera.upperRadiusLimit = 550;
-		this.camera.upperBetaLimit = 0.483 * Math.PI;
-		this.camera.maxZ = 2000;
-
-		this.camera.attachControl(this.canvas, false);
+	initFeelgoRythm: function() {
+		this.feel = new FeelgoRythm(this._canvasId);
+		this.feel.initBabylon();
+		this.feel.loadTextures();
+		this.feel.initScene();
 	},
 
-	initScene: function() {
-		this.loadGraphThemeMaterials();
-		this.loadSkyboxTextureThemes();
-		this.loadGroundThemes();
-		
-		this.initCamera();
-		this.initGround();
-		
-		this.initDefaultLights();
+	initGraphModelMenus: function() {
+		this._initTabs();
+		this._initModelMenu();
+		this._initSettingsMenu();
+		this._initCodeMenu();
 
-		this.initSkyBox();
+		// initialize semantic-ui modules
+		$('.accordion').accordion();
+		$('.dropdown').dropdown();
+		$('.ui.checkbox').checkbox();
+	},
 
-		//resize loop for web browser
-		this.engine.runRenderLoop(function() {
-			that.scene.render();
+	_initTabs: function() {
+		/*Menu Tabs*/
+
+		$('.app_menu').click( function() {
+
+			if (this.id == 'btn_model' ) {
+				var selected_sidebar = '#model_menu';
+			}
+
+			if (this.id == 'btn_settings' ) {
+				var selected_sidebar = '#settings_menu';
+			}
+
+			if (this.id == 'btn_code' ) {
+				var selected_sidebar = '#code_menu';
+			}
+
+			if (this.id == 'btn_main' ) {
+				// $('.ui.sidebar').sidebar('hide');
+				// code here
+			}
+
+			if($(selected_sidebar).hasClass('active')) {
+				$('.ui.sidebar').sidebar('hide');
+			}
+			else {
+				$('.ui.sidebar').sidebar('hide');
+				$(selected_sidebar).sidebar('show');
+			}
+
+		});
+
+			/*Menu Tabs Animations*/
+
+			$('.app_menu').mouseenter(function() {
+				$(this).stop().animate({width: '215px'}, 300, function() {
+					$(this).find('.menu_text').show();
+				});
+			  });
+
+			$('.app_menu').mouseleave(function() {
+		 		$(this).find('.menu_text').hide();
+		        $(this).stop().animate( { width: '80px'}, 300);
+		    });
+	},
+
+	_initModelMenu: function() {
+		/*Model Menu*/
+		var model = this.feel.model;
+
+		$('.vertex_buttons').click(function() {
+
+			$('.edge_buttons').removeClass('active');
+
+			if( $(this).hasClass('active') ) {
+				$(this).removeClass('active');
+			}
+			else {
+				$('.vertex_buttons').removeClass('active');
+				if(!$(this).is("#add_vertex")) {
+					$(this).addClass('active');
+				}
+				
+			}
+		});
+
+		$('.edge_buttons').click(function() {
+			$('.vertex_buttons').removeClass('active');
+
+			if( $(this).hasClass('active') ) {
+				$(this).removeClass('active');
+			}
+			else {
+				$('.edge_buttons').removeClass('active');
+				$(this).addClass('active');
+			}
 		});
 		
+		//button actions for generic graph model
+		
+		//addVertices
+		$('#add_vertex').click(function() {
+			model.graphState = "addVertice"; 
+			model.addVertex();
+		});
+		//remove vertices
+		$('#remove_vertex').click(function() {
+			model.graphState = "removeVertice";
+		});
+		//edit?
+		$('#edit_vertex').click(function() {
+			model.graphState = "edit";
+			model.play();
+		});
+		
+		//add edges
+		$('#add_edge').click(function() {
+			model.graphState = "addEdge";   
+		});
+		//remove edges
+		$('#remove_edge').click(function() {
+			model.graphState = "removeEdge"; 
+		});
+
+		//Clear graoh
+		$('#remove_all').click(function() {
+			model.removeAll();
+			model.graphState = "";
+		});
+
+		$('#orgainze_graph').click(function() {
+			model.organizeModel();
+			model.graphState = "";
+		});
 	},
 
-	initGround: function() {
-		var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
-		ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
-	}, 
+	_initSettingsMenu: function() {
+		/*Settings Menu*/
 
-	initTiledGroundGround: function() {
+		this._populateSettingsDropDowns();
+		this._initSettingsDropDowns();
+		this._initSettingsApply();
+		this._initSettingsCancle();
+		this._initSettingsDebug();
+	},
 
-		// Part 1 : Creation of Tiled Ground
-		// Parameters
-		var xmin = -500;
-		var zmin = -500;
-		var xmax =  500;
-		var zmax =  500;
-		var precision = {
-		    "w" : 16,
-		    "h" : 16
-		};
-		var subdivisions = {
-		    'h' : 4,
-		    'w' : 4
-		};
+	_initSettingsDebug: function(feel) {
+		var feel = this.feel;
+		$('#btn_debug').click(function() {
+			feel.dumpDebug();
+		});
+	},
 
-		var tiledGround = new BABYLON.Mesh.CreateTiledGround("tiledGround", xmin, zmin, xmax, zmax, 
-															subdivisions, precision, this.scene);		 
+	_initSettingsCancle: function() {
+		var feel = this.feel;
 
-		//tiledGround.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
+		$('#btn_settings_cancel').click(function() {
+			$('#dd_skybox').dropdown( 'set selected', feel._getIndexOfObjectArray(
+				feel.currentSkybox, SkyBoxThemes).toString());
+			$('#dd_vertexSize').dropdown( 'set selected',
+				feel.currentVertexSize.toString());
+			$('#dd_groundTexture').dropdown( 'set selected', feel._getIndexOfObjectArray(
+				feel.currentGroundTheme, GroundThemes).toString());
+			$('#dd_graphThemes').dropdown( 'set selected', feel._getIndexOfObjectArray(
+				feel.currentGraphTheme, GraphThemes).toString());
+		});
+	},
+
+	_initSettingsApply: function() {
+		var feel = this.feel;
+
+		$('#btn_settings_apply').click(function() {
+			var skybox_selected = $("#dd_skybox").dropdown("get value");
+			var size_selected = $("#dd_vertexSize").dropdown("get value");
+			var ground_selected = $("#dd_groundTexture").dropdown("get value");
 
 
-		 tiledGround.material = this.scene.multiMaterials[0];
+			// if(_app.feel.currentSkybox)
+
+			feel.updateSkybox(skybox_selected);
+			feel.model.updateModelSize(size_selected);
+			feel.updateGround(ground_selected);
+			/*feel.model.updateModelTheme();
+			feel.model.updateDisplayGraphValues();
+			feel.updateEnableTutorial(); */
+		});
+	},
+
+	_populateSettingsDropDowns: function() {
+		//setup Skybox dropdown box
+		for(var i = 0; i < SkyBoxThemes.length; i++) {
+			$('#dd_skybox .menu').append("<div class='item' data-value='" + i + "'>" + SkyBoxThemes[i].name + " </div>");
+
+		}
+		// fill ground texture dropdown 
+		for(var i = 0; i < GroundThemes.length; i++) {
+			$('#dd_groundTexture .menu').append("<div class='item' data-value='" + i + "'>" + GroundThemes[i].name + " </div>");
+
+		}
+
+		// fill graph themes dropdown 
+		for(var i = 0; i < GraphThemes.length; i++) {
+			$('#dd_graphThemes .menu').append("<div class='item' data-value='" + i + "'>" + GraphThemes[i].name + " </div>");
+
+		}
+	},
+
+	_initSettingsDropDowns: function() {
+		var feel = this.feel;
+		// initializing skybox dropdown
+		$('#dd_skybox').dropdown();
+		$('#dd_skybox').dropdown( 'set selected',
+		feel._getIndexOfObjectArray(feel.currentSkybox, SkyBoxThemes).toString());
 		
-		 // Needed variables to set subMeshes
-		 var verticesCount = tiledGround.getTotalVertices();
-		 var tileIndicesLength = tiledGround.getIndices().length / (subdivisions.w * subdivisions.h);
+		// initializing vertex size
+		$('#dd_vertexSize').dropdown( 'set selected',
+		feel.currentVertexSize.toString());
+
+		// initializing ground texture dropdown
+		$('#dd_groundTexture').dropdown();
+		$('#dd_groundTexture').dropdown( 'set selected',
+		feel._getIndexOfObjectArray(feel.currentGroundTheme,
+		GroundThemes).toString());
+
+		//initializing  graph theme dropdown
+	    $('#dd_graphThemes').dropdown();
+	    $('#dd_graphThemes').dropdown( 'set selected',
+	    feel._getIndexOfObjectArray(feel.currentGraphTheme,
+	    GraphThemes).toString());
+	},
+
+	_initCodeMenu: function() {
+		/*Run Code Menu*/
+		var model = this.feel.model;
+		
+		//bfsStartPoint
+		$('#bfs_start_point_graph').click(function() {
+  		    model.algoSelected = "bfs";
+  		    model.graphState = "bfs";
+				    
+		});
+		$('#dfs_start_point_graph').click(function() {
+	  		model.algoSelected = "dfs";
+	  		model.graphState = "dfs";
+				    
+		});
+		  
+		$('#short_start_point_graph').click(function() {
+	  		model.algoSelected = "short";
+	  		model.graphState = "short";
+				    
+		});
+		
+		$('#Play_graph').click(function() {
+ 		    model.graphState = "play";
+		    model.play(document.getElementById('algoArea'));
+		});
+		$('#Pause_graph').click(function() {
+		 		    model.graphState = "pause";
+		});
+		$('#Rewind_graph').click(function() {
+ 		    model.graphState = "rewind";
+		    model.play(document.getElementById('algoArea'));
+		});
+		$('#FastForward_graph').click(function() {
+ 		    model.graphState = "forward";
+		    model.play(document.getElementById('algoArea'));
+		});
+		$('#selectAlgo').dropdown();
+		$('#selectAlgo').dropdown( 'set selected', 'Breadth First Search');
 		 
-		 // Set subMeshes of the tiled ground
-		 tiledGround.subMeshes = [];
-		 var base = 0;
-		 for (var row = 0; row < subdivisions.h; row++) {
-		     for (var col = 0; col < subdivisions.w; col++) {
-		         tiledGround.subMeshes.push(new BABYLON.SubMesh(row%2 ^ col%2, 0, verticesCount, base , tileIndicesLength, tiledGround));
-		         base += tileIndicesLength;
-		     }
-		 }
-	},
-
-	initSkyBox: function() {
-
-		var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
-		skybox.material = this.scene.getMaterialByID("mat_" + this.currentSkybox);
-		skybox.infiniteDistance = true;
-
-	},
-
-	loadGraphThemeMaterials: function() {
-
-		for(var theme = 0; theme < GraphThemes.length; theme++) {
-			var currTheme = GraphThemes[theme];
-			for(var color in Palettes[currTheme.name]) {
-				var mat = new BABYLON.StandardMaterial( currTheme.name + "_"+ color.toString(), this.scene);
-				mat.diffuseColor = Palettes[currTheme.name][color];
-			}
-		}
-	},
-
-	loadSkyboxTextureThemes: function() {
-		
-		for (var theme = 0; theme < SkyBoxThemes.length; theme++) {
-			var currSkyboxTexture = SkyBoxThemes[theme];
-			var skyboxMaterial = new BABYLON.StandardMaterial("mat_" + currSkyboxTexture.name, this.scene);
-			skyboxMaterial.backFaceCulling = false;
-
-			skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-			skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-
-			skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-											this.skyboxTexturePath + currSkyboxTexture.path, this.scene);
-
-			skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-
-		};
-	},
-
-	loadGroundThemes: function() {
-		for (var theme = 0; theme < GroundThemes.length; theme++) {
-			var currGroundTheme = GroundThemes[theme];
-			var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
-			groundMaterial.diffuseTexture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
-		}
-
-
-		var whiteMaterial = new BABYLON.StandardMaterial("ground_white", this.scene);
-		 whiteMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
-
-		 var blackMaterial = new BABYLON.StandardMaterial("ground_black", this.scene);
-		 blackMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-
-		 // Create Multi Material
-		 var multimat = new BABYLON.MultiMaterial("ground_mat", this.scene);
-		 multimat.subMaterials.push(whiteMaterial);
-		 multimat.subMaterials.push(blackMaterial);
-	},
-
-	initDefaultLights: function() {
-		var light = new BABYLON.HemisphericLight("light_" + this.scene.lights.length,
-		new BABYLON.Vector3(0, 1, 0), this.scene);
-		light.intensity = 0.7;
-		this.lightcount++;
-	},
-
-	initGraphScene: function() {
-		var index = this.getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
-		this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
-		this.model.initMoveFunction();
-	},
-
-	updateSkybox: function(index) {
-		var newSkyBoxTheme = SkyBoxThemes[index];
-		var skyboxMesh = this.scene.getMeshByName("skybox");
-		skyboxMesh.material = this.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
-	},
-
-	updateGround: function(index) {
-		console.log(index);
-
-
-		var newGroundTheme = GroundThemes[index];
-		console.log(newGroundTheme);
-
-		var groundMesh = this.scene.getMeshByName("ground");
-		console.log(this.scene.getMaterialByID("mat_" + newGroundTheme.name));
-		groundMesh.material = this.scene.getMaterialByID("mat_" + newGroundTheme.name);
-	},
-	
-	dumpDebug: function() {
-		console.log(this);
-	},
-
-	getIndexOfObjectArray: function(name, objArray){
-		for(var i = 0; i < objArray.length; i++) {
-				if(objArray[i].name == name) return i;
-		}
-		return -1;
+		//TextArea Formating
+		var textArea = document.getElementById('algoArea');
+		var TextArea = new algoArea(textArea);
+		TextArea.createArea();
+		$(textArea).prop('readonly', true);
 	}
-	
+
+
 };
 
 
-var app;
 /*main function*/
 $( document ).ready( function() {
 
-	app = new FeelgoRythm('renderCanvas');
-	app.initScene();
-	app.initGraphScene();	
-	/*Menu Tabs*/
-
-	$('.accordion').accordion();
-	$('.dropdown').dropdown();
-	$('.ui.checkbox').checkbox();
-	
-	$('.app_menu').click( function() {
-
-		if (this.id == 'btn_model' ) {
-			var selected_sidebar = '#model_menu';
-		}
-
-		if (this.id == 'btn_settings' ) {
-			var selected_sidebar = '#settings_menu';
-		}
-
-		if (this.id == 'btn_code' ) {
-			var selected_sidebar = '#code_menu';
-		}
-
-		if (this.id == 'btn_main' ) {
-			// $('.ui.sidebar').sidebar('hide');
-			// code here
-		}
-
-		if($(selected_sidebar).hasClass('active')) {
-			$('.ui.sidebar').sidebar('hide');
-		}
-		else {
-			$('.ui.sidebar').sidebar('hide');
-			$(selected_sidebar).sidebar('show');
-		}
-
-	});
-
-	/*Menu Tabs Animations*/
-
-	$('.app_menu').mouseenter(function() {
-		$(this).stop().animate({width: '215px'}, 300, function() {
-			$(this).find('.menu_text').show();
-		});
-	  });
-
-	$('.app_menu').mouseleave(function() {
- 		$(this).find('.menu_text').hide();
-        $(this).stop().animate( { width: '80px'}, 300);
-    });
-
-
-    /*Model Menu*/
-
-    $('.vertex_buttons').click(function() {
-
-    	$('.edge_buttons').removeClass('active');
-
-    	if( $(this).hasClass('active') ) {
-    		$(this).removeClass('active');
-    	}
-    	else {
-    		$('.vertex_buttons').removeClass('active');
-    		if(!$(this).is("#add_vertex")) {
-    			$(this).addClass('active');
-    		}
-    		
-    	}
-    });
-
-    $('.edge_buttons').click(function() {
-    	$('.vertex_buttons').removeClass('active');
-
-    	if( $(this).hasClass('active') ) {
-    		$(this).removeClass('active');
-    	}
-    	else {
-    		$('.edge_buttons').removeClass('active');
-    		$(this).addClass('active');
-    	}
-    });
-    
-    //button actions for generic graph model
-    
-    //addVertices
-    $('#add_vertex').click(function() {
-    		app.model.graphState = "addVertice"; 
-    		 app.model.addVertex();
-    });
-    //remove vertices
-    $('#remove_vertex').click(function() {
-    		app.model.graphState = "removeVertice";
-    });
-    //edit?
-    $('#edit_vertex').click(function() {
-     		     app.model.graphState = "edit";
-    		    app.model.play();
-    });
-    
-    //add edges
-    $('#add_edge').click(function() {
-    		 app.model.graphState = "addEdge";   
-    });
-    //remove edges
-    $('#remove_edge').click(function() {
-    		  app.model.graphState = "removeEdge"; 
-    });
-
-    //Clear graoh
-    $('#remove_all').click(function() {
-    		    app.model.removeAll();
-    		    app.model.graphState = "";
-    });
-
-    $('#orgainze_graph').click(function() {
-    		    app.model.organizeModel();
-    		    app.model.graphState = "";
-    });
-
-	/*Settings Menu*/
-
-	//setup Skybox dropdown box
-	for(var i = 0; i < SkyBoxThemes.length; i++) {
-		$('#dd_skybox .menu').append("<div class='item' data-value='" + i + "'>" + SkyBoxThemes[i].name + " </div>");
-
-	}
-
-	for(var i = 0; i < GroundThemes.length; i++) {
-		$('#dd_groundTexture .menu').append("<div class='item' data-value='" + i + "'>" + GroundThemes[i].name + " </div>");
-
-	}
-
-	for(var i = 0; i < GraphThemes.length; i++) {
-		$('#dd_graphThemes .menu').append("<div class='item' data-value='" + i + "'>" + GraphThemes[i].name + " </div>");
-
-	}
-
-	$('#dd_skybox').dropdown();
-	$('#dd_skybox').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentSkybox, SkyBoxThemes).toString());
-	
-	$('#dd_vertexSize').dropdown( 'set selected',app.currentVertexSize.toString());
-
-	$('#dd_groundTexture').dropdown();
-	$('#dd_groundTexture').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGroundTheme, GroundThemes).toString());
-
-    $('#dd_graphThemes').dropdown();
-    $('#dd_graphThemes').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGraphTheme, GraphThemes).toString());
-
-    $('#btn_settings_apply').click(function() {
-    	app.updateSkybox($("#dd_skybox").dropdown("get value") );
-    	app.model.updateModelSize($("#dd_vertexSize").dropdown("get value"));
-    	app.updateGround($("#dd_groundTexture").dropdown("get value"));
-    	/*app.model.updateModelTheme();
-    	app.updateDisplayGraphValues();
-    	app.updateEnableTutorial(); */
-    });
-
-    $('#btn_settings_cancel').click(function() {
-    	$('#dd_skybox').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentSkybox, SkyBoxThemes).toString());
-    	$('#dd_vertexSize').dropdown( 'set selected',app.currentVertexSize.toString());
-    	$('#dd_groundTexture').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGroundTheme, GroundThemes).toString());
-    	$('#dd_graphThemes').dropdown( 'set selected', app.getIndexOfObjectArray(app.currentGraphTheme, GraphThemes).toString());
-    });
-
-    $('#btn_debug').click(function() {
-    	app.dumpDebug();
-    });
-
-
-    /*Run Code Menu*/
-    
-    //bfsStartPoint
-      $('#bfs_start_point_graph').click(function() {
-      		      app.model.algoSelected = "bfs";
-      		    app.model.graphState = "bfs";
-    		    
-    });
-      $('#dfs_start_point_graph').click(function() {
-      		    app.model.algoSelected = "dfs";
-      		    app.model.graphState = "dfs";
-    		    
-    });
-      
-      $('#short_start_point_graph').click(function() {
-      		    app.model.algoSelected = "short";
-      		    app.model.graphState = "short";
-    		    
-    });
-    
-     $('#Play_graph').click(function() {
-     		     app.model.graphState = "play";
-    		    app.model.play(document.getElementById('algoArea'));
-    });
-     $('#Pause_graph').click(function() {
-     		     app.model.graphState = "pause";
-    });
-     $('#Rewind_graph').click(function() {
-     		     app.model.graphState = "rewind";
-    		    app.model.play(document.getElementById('algoArea'));
-    });
-     $('#FastForward_graph').click(function() {
-     		     app.model.graphState = "forward";
-    		    app.model.play(document.getElementById('algoArea'));
-    });
-     $('#selectAlgo').dropdown();
-     $('#selectAlgo').dropdown( 'set selected', 'Breadth First Search');
-     
-    //TextArea Formating
-    var textArea = document.getElementById('algoArea');
-    var TextArea = new algoArea(textArea);
-    TextArea.createArea();
-    $(textArea).prop('readonly', true);
+	var app = new App('renderCanvas');
+	app.initFeelgoRythm();
+	app.feel.initGraphModel();	
+	app.initGraphModelMenus();
+ 
 });

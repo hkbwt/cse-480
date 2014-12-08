@@ -421,7 +421,7 @@ GraphModel.prototype = {
 			 this.scene = this.algoFrames[this.playPosition].createScene();
 			 Area.selectLine(this.algoFrames[this.playPosition].currentState);
 			 this.playPosition++;
-			 setTimeout(function(){that.play_helper(Area);}, 100);
+			 setTimeout(function(){that.play_helper(Area);}, 500);
 			}
 			else{;
 				this.graphState = "end";

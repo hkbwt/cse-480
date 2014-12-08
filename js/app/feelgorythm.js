@@ -3,7 +3,7 @@
 */
 
 var FeelgoRythm = function(documentId) {
-	var that = this;
+	thisFeelGoRythm = this;
 
 	//main babylonjs componets
 	this.documentId = documentId;
@@ -48,7 +48,7 @@ FeelgoRythm.prototype = {
 		this.scene = new BABYLON.Scene(this.engine);
 
 		window.addEventListener("resize", function () {
-				that.engine.resize();	
+				thisFeelGoRythm.engine.resize();	
 		});	
 	},
 
@@ -68,7 +68,7 @@ FeelgoRythm.prototype = {
 
 		//resize loop for web browser
 		this.engine.runRenderLoop(function() {
-			that.scene.render();
+			thisFeelGoRythm.scene.render();
 		});		
 	},
 
@@ -188,8 +188,8 @@ FeelgoRythm.prototype = {
 
 	updateSkybox: function(index) {
 		var newSkyBoxTheme = SkyBoxThemes[index];
-		var skyboxMesh = this.scene.getMeshByName("skybox");
-		skyboxMesh.material = this.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
+		var skyboxMesh = thisFeelGoRythm.scene.getMeshByName("skybox");
+		skyboxMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
 	},
 
 	updateGround: function(index) {
@@ -199,9 +199,9 @@ FeelgoRythm.prototype = {
 		var newGroundTheme = GroundThemes[index];
 		console.log(newGroundTheme);
 
-		var groundMesh = this.scene.getMeshByName("ground");
-		console.log(this.scene.getMaterialByID("mat_" + newGroundTheme.name));
-		groundMesh.material = this.scene.getMaterialByID("mat_" + newGroundTheme.name);
+		var groundMesh = thisFeelGoRythm.scene.getMeshByName("ground");
+		console.log(thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name));
+		groundMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name);
 	},
 	
 	dumpDebug: function() {

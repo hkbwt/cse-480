@@ -59,7 +59,7 @@ var SkyBoxThemes = [
 
 
 var GroundThemes = [
-	{name: "blue_brick", filename: "blue_brick.jpg"},
-	{name: "grey_brick", filename: "grey_brick.jpg"},
-	{name: "red_brick", filename: "red_brick.jpg"},
+	{name: "gplay", filename: "gplay-1920x1080.png"},
+	{name: "grid-me", filename: "grid-me-1920x1080.png"},
+	{name: "subtle-grey", filename: "subtle-grey-1920x1080.png"},
 ];

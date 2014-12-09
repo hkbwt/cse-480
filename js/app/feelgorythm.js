@@ -16,7 +16,7 @@ var FeelgoRythm = function(documentId) {
 	this.model = undefined;
 	this.currentGraphTheme = "Rainbowz";
 	this.currentSkybox = "alien";
-	this.currentGroundTheme = "grey_brick";
+	this.currentGroundTheme = "grid-me";
 	this.currentVertexSize = "medium";
 	this.bDisplayGraphValues = false;
 	this.bEnableTutorial = false;
@@ -157,7 +157,12 @@ FeelgoRythm.prototype = {
 		for (var theme = 0; theme < GroundThemes.length; theme++) {
 			var currGroundTheme = GroundThemes[theme];
 			var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
-			groundMaterial.diffuseTexture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
+			var texture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
+			texture.uScale = 1.0;
+			texture.vScale = 1.5;
+
+			groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+			groundMaterial.diffuseTexture = texture;
 		}
 
 

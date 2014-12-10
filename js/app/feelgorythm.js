@@ -4,6 +4,7 @@
 
 var FeelgoRythm = function(documentId) {
 	thisFeelGoRythm = this;
+	console.log(thisFeelGoRythm);
 
 	//main babylonjs componets
 	this.documentId = documentId;
@@ -47,6 +48,7 @@ FeelgoRythm.prototype = {
 		this.canvas = document.getElementById(this.documentId);
 		this.engine = new BABYLON.Engine(this.canvas, true);
 		this.scene = new BABYLON.Scene(this.engine);
+		this.initMoveFunction();
 
 		window.addEventListener("resize", function () {
 				thisFeelGoRythm.engine.resize();	
@@ -77,46 +79,6 @@ FeelgoRythm.prototype = {
 		var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
 		ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
 	}, 
-
-	initTiledGroundGround: function() {
-
-		// Part 1 : Creation of Tiled Ground
-		// Parameters
-		var xmin = -500;
-		var zmin = -500;
-		var xmax =  500;
-		var zmax =  500;
-		var precision = {
-		    "w" : 16,
-		    "h" : 16
-		};
-		var subdivisions = {
-		    'h' : 4,
-		    'w' : 4
-		};
-
-		var tiledGround = new BABYLON.Mesh.CreateTiledGround("tiledGround", xmin, zmin, xmax, zmax, 
-															subdivisions, precision, this.scene);		 
-
-		//tiledGround.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
-
-
-		 tiledGround.material = this.scene.multiMaterials[0];
-		
-		 // Needed variables to set subMeshes
-		 var verticesCount = tiledGround.getTotalVertices();
-		 var tileIndicesLength = tiledGround.getIndices().length / (subdivisions.w * subdivisions.h);
-		 
-		 // Set subMeshes of the tiled ground
-		 tiledGround.subMeshes = [];
-		 var base = 0;
-		 for (var row = 0; row < subdivisions.h; row++) {
-		     for (var col = 0; col < subdivisions.w; col++) {
-		         tiledGround.subMeshes.push(new BABYLON.SubMesh(row%2 ^ col%2, 0, verticesCount, base , tileIndicesLength, tiledGround));
-		         base += tileIndicesLength;
-		     }
-		 }
-	},
 
 	initSkyBox: function() {
 
@@ -189,7 +151,6 @@ FeelgoRythm.prototype = {
 	initGraphModel: function() {
 		var index = this._getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
 		this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
-		this.model.initMoveFunction();
 	},
 
 	updateSkybox: function(index) {
@@ -219,6 +180,70 @@ FeelgoRythm.prototype = {
 				if(objArray[i].name == name) return i;
 		}
 		return -1;
+	},
+
+	getGroundPosition: function () {
+        	// Use a predicate to get position on the ground
+        	var pickinfo = thisFeelGoRythm.scene.pick(thisFeelGoRythm.scene.pointerX, thisFeelGoRythm.scene.pointerY, function (mesh) { return mesh == thisFeelGoRythm.scene.meshes[0]; });
+       		if (pickinfo.hit) {
+       			return pickinfo.pickedPoint;
+        	}
+
+        	return null;
+    },
+	
+	onPointerDown: function(evt){
+		var gmodel = thisFeelGoRythm.model;
+		if(evt.button !== 0){
+			return;
+		}
+		var pickInfo = thisFeelGoRythm.scene.pick(that.scene.pointerX, 
+			thisFeelGoRythm.scene.pointerY, function (mesh) { return (mesh !== thisFeelGoRythm.scene.meshes[0] && mesh !== thisFeelGoRythm.scene.meshes[1] /*&& mesh.tags.indexOf("edges") != -1*/); });
+		
+		if (pickInfo.pickedMesh != null && pickInfo.pickedMesh.matchesTagsQuery("vertex") &&  pickInfo.hit) {
+			gmodel.currentMesh = pickInfo.pickedMesh;
+			gmodel.startingPoint = thisFeelGoRythm.getGroundPosition(evt);
+			if (gmodel.startingPoint) { // we need to disconnect camera from canvas
+				setTimeout(function () {
+						thisFeelGoRythm.scene.cameras[0].detachControl(thisFeelGoRythm.engine.getRenderingCanvas());
+				}, 0);
+            }
+        }
+    },
+
+    onPointerUp: function () {
+    	var gmodel = thisFeelGoRythm.model;
+
+        if (gmodel.startingPoint) {
+            thisFeelGoRythm.scene.cameras[0].attachControl(thisFeelGoRythm.engine.getRenderingCanvas(), true);
+            gmodel.startingPoint = null;
+            return;
+        }
+    },
+
+    onPointerMove: function (evt) {
+    	var gmodel = thisFeelGoRythm.model;
+
+        if (!gmodel.startingPoint) {
+            return;
+        }
+
+        var current = thisFeelGoRythm.getGroundPosition(evt);
+
+        if (!current) {
+            return;
+        }
+
+        var diff = current.subtract(gmodel.startingPoint);
+        gmodel.currentMesh.position.addInPlace(diff);
+        gmodel.updateEdges(gmodel.currentMesh);
+        gmodel.startingPoint = current;
+    },
+
+	initMoveFunction: function(){
+		this.engine.getRenderingCanvas().addEventListener("pointerdown", thisFeelGoRythm.onPointerDown, false);
+		this.engine.getRenderingCanvas().addEventListener("pointerup", thisFeelGoRythm.onPointerUp, false);
+		this.engine.getRenderingCanvas().addEventListener("pointermove", thisFeelGoRythm.onPointerMove, false);
 	}
 	
 };

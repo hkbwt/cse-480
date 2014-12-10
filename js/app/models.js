@@ -54,8 +54,6 @@ GraphModel.prototype = {
 			this.meshSize = 15.0;
 			this.meshSegments = 10.0;
 		}
-
-
 	},
 	
 	addEdgeByValues: function(v, w) {
@@ -285,64 +283,7 @@ GraphModel.prototype = {
 		}
 	},
 
-	getGroundPosition: function () {
-        	// Use a predicate to get position on the ground
-        	var pickinfo = that.scene.pick(that.scene.pointerX, that.scene.pointerY, function (mesh) { return mesh == that.scene.meshes[0]; });
-       		if (pickinfo.hit) {
-       			return pickinfo.pickedPoint;
-        	}
 
-        	return null;
-    },
-	
-	onPointerDown: function(evt){
-		if(evt.button !== 0){
-			return;
-		}
-		var pickInfo = that.scene.pick(that.scene.pointerX, 
-			that.scene.pointerY, function (mesh) { return (mesh !== that.scene.meshes[0] && mesh !== that.scene.meshes[1] /*&& mesh.tags.indexOf("edges") != -1*/); });
-		
-		if (pickInfo.pickedMesh != null && pickInfo.pickedMesh.matchesTagsQuery("vertex") &&  pickInfo.hit) {
-			that.currentMesh = pickInfo.pickedMesh;
-			that.startingPoint = that.getGroundPosition(evt);
-			if (that.startingPoint) { // we need to disconnect camera from canvas
-				setTimeout(function () {
-						that.scene.cameras[0].detachControl(that.scene._engine.getRenderingCanvas());
-				}, 0);
-            }
-        }
-    },
-
-    onPointerUp: function () {
-        if (that.startingPoint) {
-            that.scene.cameras[0].attachControl(that.scene._engine.getRenderingCanvas(), true);
-            that.startingPoint = null;
-            return;
-        }
-    },
-
-    onPointerMove: function (evt) {
-        if (!that.startingPoint) {
-            return;
-        }
-
-        var current = that.getGroundPosition(evt);
-
-        if (!current) {
-            return;
-        }
-
-        var diff = current.subtract(that.startingPoint);
-        that.currentMesh.position.addInPlace(diff);
-        that.updateEdges(that.currentMesh);
-        that.startingPoint = current;
-    },
-
-	initMoveFunction: function(){
-		this.scene._engine.getRenderingCanvas().addEventListener("pointerdown", that.onPointerDown, false);
-		this.scene._engine.getRenderingCanvas().addEventListener("pointerup", that.onPointerUp, false);
-		this.scene._engine.getRenderingCanvas().addEventListener("pointermove", that.onPointerMove, false);
-	},
 
 	updateEdges: function(mesh){
 		
@@ -417,8 +358,9 @@ GraphModel.prototype = {
 		that.play_helper(Area);
 		
 	},
+
 	play_helper: function(Area){
-	switch(this.graphState){
+		switch(this.graphState){
 		case "play":
 			if(this.playPosition < this.algoFrames.length){
 			 this.scene = this.algoFrames[this.playPosition].createScene();
@@ -464,7 +406,6 @@ GraphModel.prototype = {
 			vertexList[vertexCount].position = new BABYLON.Vector3(coord.x, this.meshSize + 5, coord.y);
 			that.updateEdges(vertexList[vertexCount]);
 		}
-
 	},
 
 	getCirclePatternPosition: function(nth) {

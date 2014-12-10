@@ -14,7 +14,7 @@ var FeelgoRythm = function(documentId) {
 
 	//app variables
 	this.model = undefined;
-	this.currentGraphTheme = "Rainbowz";
+	this.currentGraphTheme = "Halloween";
 	this.currentSkybox = "alien";
 	this.currentGroundTheme = "grid-me";
 	this.currentVertexSize = "medium";
@@ -30,12 +30,13 @@ FeelgoRythm.prototype = {
 
 	initCamera: function() {
 		this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
-					 1.5319001498871874, 1.3278950757638162, 180.04261169410753,
+					 0.0, 0.0, 200.0,
 					 new BABYLON.Vector3(0, 0, 0), this.scene);
 		
 		this.camera.lowerRadiusLimit = 20;
-		this.camera.upperRadiusLimit = 550;
-		this.camera.upperBetaLimit = 0.483 * Math.PI;
+		this.camera.upperRadiusLimit = 650;
+		this.camera.upperBetaLimit = 0.334 * Math.PI;
+		this.camera.upperAlphaLimit = Math.PI;
 		this.camera.maxZ = 2000;
 
 		this.camera.attachControl(this.canvas, false);

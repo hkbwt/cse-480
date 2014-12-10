@@ -274,6 +274,9 @@ GraphModel.prototype = {
 		var m = this.scene.getMeshesByTags("vertex");
 		console.log(n);
 		console.log(m);
+
+		this.graph.vertCount = 0;
+
 		for(var i = 0; i< n.length; i++){
 			n[i].dispose();
 		}	

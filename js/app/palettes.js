@@ -44,7 +44,7 @@ function ColorTheme(name, vertexMat, edgeMat, activeMatOne, activeMatTwo, select
 
 var GraphThemes = [
 	{name: "Rainbowz", colortheme: new ColorTheme('Rainbowz','blue', 'orange', 'yellow', 'red', 'green')},
-	{name: "Halloween", colortheme: new ColorTheme('Halloween', 'black', 'orange', 'green', 'purple', 'white')}
+	{name: "Halloween", colortheme: new ColorTheme('Halloween', 'white', 'orange', 'green', 'purple', 'black' )}
 ];
 
 var SkyBoxThemes = [

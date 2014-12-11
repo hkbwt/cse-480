@@ -1,249 +1,266 @@
 /*
-*	"We want you to feel the algorithm"
+*   "We want you to feel the algorithm"
 */
 
 var FeelgoRythm = function(documentId) {
-	thisFeelGoRythm = this;
-	console.log(thisFeelGoRythm);
+    thisFeelGoRythm = this;
+    console.log(thisFeelGoRythm);
 
-	//main babylonjs componets
-	this.documentId = documentId;
-	this.canvas = undefined;
-	this.engine = undefined;
-	this.scene = undefined;
-
-
-	//app variables
-	this.model = undefined;
-	this.currentGraphTheme = "Halloween";
-	this.currentSkybox = "alien";
-	this.currentGroundTheme = "grid-me";
-	this.currentVertexSize = "medium";
-	this.bDisplayGraphValues = false;
-	this.bEnableTutorial = false;
-
-	//asset paths
-	this.skyboxTexturePath = "textures/skybox/";
-	this.groundTexturePath = "textures/ground/";
+    //main babylonjs componets
+    this.documentId          = documentId;
+    this.canvas              = undefined;
+    this.engine              = undefined;
+    this.scene               = undefined;
+    
+    
+    //app variables
+    this.model               = undefined;
+    this.currentGraphTheme   = "Halloween";
+    this.currentSkybox       = "alien";
+    this.currentGroundTheme  = "grid-me";
+    this.currentVertexSize   = "medium";
+    this.bDisplayGraphValues = false;
+    this.bEnableTutorial     = false;
+    
+    //asset paths
+    this.skyboxTexturePath   = "textures/skybox/";
+    this.groundTexturePath   = "textures/ground/";
 };
 
 FeelgoRythm.prototype = {
 
-	initCamera: function() {
-		this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
-					 0.0, 0.0, 200.0,
-					 new BABYLON.Vector3(0, 0, 0), this.scene);
-		
-		this.camera.lowerRadiusLimit = 20;
-		this.camera.upperRadiusLimit = 650;
-		this.camera.upperBetaLimit = 0.334 * Math.PI;
-		this.camera.upperAlphaLimit = Math.PI;
-		this.camera.maxZ = 2000;
+    initCamera: function() {
+        this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
+                     0.0, 0.0, 200.0,
+                     new BABYLON.Vector3(0, 0, 0), this.scene);
+        
+        this.camera.lowerRadiusLimit = 20;
+        this.camera.upperRadiusLimit = 650;
+        this.camera.upperBetaLimit = 0.334 * Math.PI;
+        this.camera.upperAlphaLimit = Math.PI;
+        this.camera.maxZ = 2000;
 
-		this.camera.attachControl(this.canvas, false);
-	},
-
-	initBabylon: function() {
-
-		this.canvas = document.getElementById(this.documentId);
-		this.engine = new BABYLON.Engine(this.canvas, true);
-		this.scene = new BABYLON.Scene(this.engine);
-		this.initMoveFunction();
-
-		window.addEventListener("resize", function () {
-				thisFeelGoRythm.engine.resize();	
-		});	
-	},
-
-	loadTextures: function() {
-
-		this.loadGraphThemeMaterials();
-		this.loadSkyboxTextureThemes();
-		this.loadGroundThemes();
-	},
-
-	initScene: function() {
-		
-		this.initCamera();
-		this.initGround();
-		this.initDefaultLights();
-		this.initSkyBox();
-
-		//resize loop for web browser
-		this.engine.runRenderLoop(function() {
-			thisFeelGoRythm.scene.render();
-		});		
-	},
-
-	initGround: function() {
-		var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
-		ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
-	}, 
-
-	initSkyBox: function() {
-
-		var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
-		skybox.material = this.scene.getMaterialByID("mat_" + this.currentSkybox);
-		skybox.infiniteDistance = true;
-	},
-
-	loadGraphThemeMaterials: function() {
-
-		for(var theme = 0; theme < GraphThemes.length; theme++) {
-			var currTheme = GraphThemes[theme];
-			for(var color in Palettes[currTheme.name]) {
-				var mat = new BABYLON.StandardMaterial( currTheme.name + "_"+ color.toString(), this.scene);
-				mat.diffuseColor = Palettes[currTheme.name][color];
-			}
-		}
-	},
-
-	loadSkyboxTextureThemes: function() {
-		
-		for (var theme = 0; theme < SkyBoxThemes.length; theme++) {
-			var currSkyboxTexture = SkyBoxThemes[theme];
-			var skyboxMaterial = new BABYLON.StandardMaterial("mat_" + currSkyboxTexture.name, this.scene);
-			skyboxMaterial.backFaceCulling = false;
-
-			skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-			skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-
-			skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-											this.skyboxTexturePath + currSkyboxTexture.path, this.scene);
-
-			skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-
-		};
-	},
-
-	loadGroundThemes: function() {
-		for (var theme = 0; theme < GroundThemes.length; theme++) {
-			var currGroundTheme = GroundThemes[theme];
-			var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
-			var texture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
-			texture.uScale = 1.0;
-			texture.vScale = 1.5;
-
-			groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-			groundMaterial.diffuseTexture = texture;
-		}
-
-
-		var whiteMaterial = new BABYLON.StandardMaterial("ground_white", this.scene);
-		 whiteMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
-
-		 var blackMaterial = new BABYLON.StandardMaterial("ground_black", this.scene);
-		 blackMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-
-		 // Create Multi Material
-		 var multimat = new BABYLON.MultiMaterial("ground_mat", this.scene);
-		 multimat.subMaterials.push(whiteMaterial);
-		 multimat.subMaterials.push(blackMaterial);
-	},
-
-	initDefaultLights: function() {
-		var light = new BABYLON.HemisphericLight("light_" + this.scene.lights.length,
-		new BABYLON.Vector3(0, 1, 0), this.scene);
-		light.intensity = 0.7;
-		this.lightcount++;
-	},
-
-	initGraphModel: function() {
-		var index = this._getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
-		this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
-	},
-
-	updateSkybox: function(index) {
-		var newSkyBoxTheme = SkyBoxThemes[index];
-		var skyboxMesh = thisFeelGoRythm.scene.getMeshByName("skybox");
-		skyboxMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
-	},
-
-	updateGround: function(index) {
-		console.log(index);
-
-
-		var newGroundTheme = GroundThemes[index];
-		console.log(newGroundTheme);
-
-		var groundMesh = thisFeelGoRythm.scene.getMeshByName("ground");
-		console.log(thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name));
-		groundMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name);
-	},
-	
-	dumpDebug: function() {
-		console.log(this);
-	},
-
-	_getIndexOfObjectArray: function(name, objArray){
-		for(var i = 0; i < objArray.length; i++) {
-				if(objArray[i].name == name) return i;
-		}
-		return -1;
-	},
-
-	getGroundPosition: function () {
-        	// Use a predicate to get position on the ground
-        	var pickinfo = thisFeelGoRythm.scene.pick(thisFeelGoRythm.scene.pointerX, thisFeelGoRythm.scene.pointerY, function (mesh) { return mesh == thisFeelGoRythm.scene.meshes[0]; });
-       		if (pickinfo.hit) {
-       			return pickinfo.pickedPoint;
-        	}
-
-        	return null;
+        this.camera.attachControl(this.canvas, false);
     },
-	
-	onPointerDown: function(evt){
-		var gmodel = thisFeelGoRythm.model;
-		if(evt.button !== 0){
-			return;
-		}
-		var pickInfo = thisFeelGoRythm.scene.pick(that.scene.pointerX, 
-			thisFeelGoRythm.scene.pointerY, function (mesh) { return (mesh !== thisFeelGoRythm.scene.meshes[0] && mesh !== thisFeelGoRythm.scene.meshes[1] /*&& mesh.tags.indexOf("edges") != -1*/); });
-		
-		if (pickInfo.pickedMesh != null && pickInfo.pickedMesh.matchesTagsQuery("vertex") &&  pickInfo.hit) {
-			gmodel.currentMesh = pickInfo.pickedMesh;
-			gmodel.startingPoint = thisFeelGoRythm.getGroundPosition(evt);
-			if (gmodel.startingPoint) { // we need to disconnect camera from canvas
-				setTimeout(function () {
-						thisFeelGoRythm.scene.cameras[0].detachControl(thisFeelGoRythm.engine.getRenderingCanvas());
-				}, 0);
+
+    initBabylon: function() {
+
+        this.canvas = document.getElementById(this.documentId);
+        this.engine = new BABYLON.Engine(this.canvas, true);
+        this.scene = new BABYLON.Scene(this.engine);
+        this.initMoveFunction();
+
+        window.addEventListener("resize", function () {
+                thisFeelGoRythm.engine.resize();    
+        }); 
+    },
+
+    loadTextures: function() {
+
+        this.loadGraphThemeMaterials();
+        this.loadSkyboxTextureThemes();
+        this.loadGroundThemes();
+    },
+
+    initScene: function() {
+        
+        this.initCamera();
+        this.initGround();
+        this.initDefaultLights();
+        this.initSkyBox();
+
+        //resize loop for web browser
+        this.engine.runRenderLoop(function() {
+            thisFeelGoRythm.scene.render();
+        });     
+    },
+
+    initGround: function() {
+        var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
+        ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
+    }, 
+
+    initSkyBox: function() {
+
+        var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
+        skybox.material = this.scene.getMaterialByID("mat_" + this.currentSkybox);
+        skybox.infiniteDistance = true;
+    },
+
+    loadGraphThemeMaterials: function() {
+
+        for(var theme = 0; theme < GraphThemes.length; theme++) {
+            var currTheme = GraphThemes[theme];
+            for(var color in Palettes[currTheme.name]) {
+                var mat = new BABYLON.StandardMaterial( currTheme.name + "_"+ color.toString(), this.scene);
+                mat.diffuseColor = Palettes[currTheme.name][color];
             }
         }
     },
 
+    loadSkyboxTextureThemes: function() {
+        
+        for (var theme = 0; theme < SkyBoxThemes.length; theme++) {
+            var currSkyboxTexture = SkyBoxThemes[theme];
+            var skyboxMaterial = new BABYLON.StandardMaterial("mat_" + currSkyboxTexture.name, this.scene);
+            skyboxMaterial.backFaceCulling = false;
+
+            skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+            skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+                                            this.skyboxTexturePath + currSkyboxTexture.path, this.scene);
+
+            skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+
+        }
+    },
+
+    loadGroundThemes: function() {
+        for (var theme = 0; theme < GroundThemes.length; theme++) {
+            var currGroundTheme = GroundThemes[theme];
+            var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
+            var texture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
+            texture.uScale = 1.0;
+            texture.vScale = 1.5;
+
+            groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            groundMaterial.diffuseTexture = texture;
+        }
+
+
+        var whiteMaterial = new BABYLON.StandardMaterial("ground_white", this.scene);
+         whiteMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
+
+         var blackMaterial = new BABYLON.StandardMaterial("ground_black", this.scene);
+         blackMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+
+         // Create Multi Material
+         var multimat = new BABYLON.MultiMaterial("ground_mat", this.scene);
+         multimat.subMaterials.push(whiteMaterial);
+         multimat.subMaterials.push(blackMaterial);
+    },
+
+    initDefaultLights: function() {
+        var light = new BABYLON.HemisphericLight("light_" + this.scene.lights.length,
+        new BABYLON.Vector3(0, 1, 0), this.scene);
+        light.intensity = 0.7;
+        this.lightcount++;
+    },
+
+    initGraphModel: function() {
+        var index = this._getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
+        this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
+    },
+
+    updateSkybox: function(index) {
+        var newSkyBoxTheme = SkyBoxThemes[index];
+        var skyboxMesh = thisFeelGoRythm.scene.getMeshByName("skybox");
+        skyboxMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
+    },
+
+    updateGround: function(index) {
+        console.log(index);
+
+
+        var newGroundTheme = GroundThemes[index];
+        console.log(newGroundTheme);
+
+        var groundMesh = thisFeelGoRythm.scene.getMeshByName("ground");
+        console.log(thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name));
+        groundMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name);
+    },
+    
+    dumpDebug: function() {
+        console.log(this);
+    },
+
+    _getIndexOfObjectArray: function(name, objArray){
+        for(var i = 0; i < objArray.length; i++) {
+                if(objArray[i].name == name) return i;
+        }
+        return -1;
+    },
+
+    getGroundPosition: function () {
+        // Use a predicate to get position on the ground
+        var pickinfo = thisFeelGoRythm.scene.pick(
+                thisFeelGoRythm.scene.pointerX,
+                thisFeelGoRythm.scene.pointerY, 
+                function (mesh) { 
+                    return mesh == thisFeelGoRythm.scene.meshes[0]; 
+             });
+
+        if (pickinfo.hit) { return pickinfo.pickedPoint; }
+        return null;
+    },
+    
+    onPointerDown: function(evt){
+        var gmodel = thisFeelGoRythm.model;
+        if(evt.button !== 0){ return; }
+
+        var pickInfo = thisFeelGoRythm.scene.pick(
+                thisFeelGoRythm.scene.pointerX, 
+                thisFeelGoRythm.scene.pointerY, 
+                function (mesh) { 
+                    return (mesh !== thisFeelGoRythm.scene.meshes[0] &&
+                            mesh !== thisFeelGoRythm.scene.meshes[1]); 
+            });
+
+        if (pickInfo.pickedMesh !== null &&
+            pickInfo.pickedMesh.matchesTagsQuery("vertex") &&
+            pickInfo.hit) {
+
+            gmodel.setSelectedVertex(pickInfo.pickedMesh);
+            gmodel.startingPoint = thisFeelGoRythm.getGroundPosition(evt);
+
+            if (gmodel.startingPoint) { 
+                // we need to disconnect camera from canvas
+                setTimeout(function () {
+                        thisFeelGoRythm.scene.cameras[0].detachControl(thisFeelGoRythm.engine.getRenderingCanvas());
+                }, 0);
+            }
+        }
+        
+    },
+
     onPointerUp: function () {
-    	var gmodel = thisFeelGoRythm.model;
+        var gmodel = thisFeelGoRythm.model;
 
         if (gmodel.startingPoint) {
-            thisFeelGoRythm.scene.cameras[0].attachControl(thisFeelGoRythm.engine.getRenderingCanvas(), true);
+            thisFeelGoRythm.scene.cameras[0].attachControl(
+                thisFeelGoRythm.engine.getRenderingCanvas(), true);
+            
             gmodel.startingPoint = null;
             return;
         }
     },
 
     onPointerMove: function (evt) {
-    	var gmodel = thisFeelGoRythm.model;
+        var gmodel = thisFeelGoRythm.model;
 
         if (!gmodel.startingPoint) {
             return;
         }
 
-        var current = thisFeelGoRythm.getGroundPosition(evt);
+        var currentPointerPosition = thisFeelGoRythm.getGroundPosition(evt);
 
-        if (!current) {
+        if (!currentPointerPosition) {
             return;
         }
 
-        var diff = current.subtract(gmodel.startingPoint);
-        gmodel.currentMesh.position.addInPlace(diff);
-        gmodel.updateEdges(gmodel.currentMesh);
-        gmodel.startingPoint = current;
+        var diff = currentPointerPosition.subtract(gmodel.startingPoint);
+        var selectedMesh = gmodel.getSelectedVertex();
+        
+        selectedMesh.position.addInPlace(diff);
+        gmodel.updateEdges(selectedMesh);
+        gmodel.startingPoint = currentPointerPosition;
     },
 
-	initMoveFunction: function(){
-		this.engine.getRenderingCanvas().addEventListener("pointerdown", thisFeelGoRythm.onPointerDown, false);
-		this.engine.getRenderingCanvas().addEventListener("pointerup", thisFeelGoRythm.onPointerUp, false);
-		this.engine.getRenderingCanvas().addEventListener("pointermove", thisFeelGoRythm.onPointerMove, false);
-	}
-	
+    initMoveFunction: function(){
+        this.engine.getRenderingCanvas().addEventListener("pointerdown", thisFeelGoRythm.onPointerDown, false);
+        this.engine.getRenderingCanvas().addEventListener("pointerup", thisFeelGoRythm.onPointerUp, false);
+        this.engine.getRenderingCanvas().addEventListener("pointermove", thisFeelGoRythm.onPointerMove, false);
+    }
+    
 };

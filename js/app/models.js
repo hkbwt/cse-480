@@ -313,13 +313,13 @@ GraphModel.prototype = {
             var toVertex;
             for(var j = 0; j <that.scene.meshes.length; j++){
                 if(this.graph.getVertexIdByName(that.scene.meshes[j].name) == edgeVertices[0]){
-                    fromVertex = that.scene.meshes[j]
-                    break;};
+                    fromVertex = that.scene.meshes[j];
+                    break;}
             }
             for(var j = 0; j<that.scene.meshes.length; j++){
                 if(this.graph.getVertexIdByName(that.scene.meshes[j].name) == edgeVertices[1]){
-                    toVertex = that.scene.meshes[j]
-                    break;};
+                    toVertex = that.scene.meshes[j];
+                    break;}
             }
             var v = this.graph.getVertexIdByName(fromVertex.name);
             var w = this.graph.getVertexIdByName(toVertex.name);
@@ -355,14 +355,14 @@ GraphModel.prototype = {
             n = new runBFS();
             break;
         case "dfs":
-            n = new DFS()
+            n = new DFS();
             break;
         case "short":
             n = new ShortestPathBFS();
             break;
         }
         var Area = new algoArea(initCodeScene);
-        Area.setText(n.getStringVersion)
+        Area.setText(n.getStringVersion);
         that = that2;
         that.play_helper(Area);
         
@@ -377,7 +377,7 @@ GraphModel.prototype = {
              this.playPosition++;
              setTimeout(function(){that.play_helper(Area);}, 100);
             }
-            else{;
+            else{
                 this.graphState = "end";
             }
             break;

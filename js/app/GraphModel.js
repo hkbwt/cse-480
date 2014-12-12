@@ -314,7 +314,8 @@ GraphModel.prototype = {
             for(var j = 0; j <that.scene.meshes.length; j++){
                 if(this.graph.getVertexIdByName(that.scene.meshes[j].name) == edgeVertices[0]){
                     fromVertex = that.scene.meshes[j];
-                    break;}
+                    break;
+                }
             }
             for(var j = 0; j<that.scene.meshes.length; j++){
                 if(this.graph.getVertexIdByName(that.scene.meshes[j].name) == edgeVertices[1]){

@@ -1,12 +1,12 @@
 var pause = 0;
 var play = 1;
 var rewind = -1;
-var GraphState = function(){
+var GraphState = function() {
 	this.currentState;
 	this.playState = 1;
 	this.pauseState = 0;
 	this.rewindState = -1;
-} 
+};
 
 GraphState.prototype = {
 
@@ -18,19 +18,16 @@ GraphState.prototype = {
 	},
 	setRewindState: function(){
 		this.currentState = this.rewindState;
-	}
+	},
 	getState: function(){
 		switch(currentState){
 		case this.playState:
 				return "play";
-			break;
 		case this.pauseState:
 				return "pause";
-			break;
 		case this.rewind:
 				return "rewind";
-			break;
 		}
 	}
 
-}
+};

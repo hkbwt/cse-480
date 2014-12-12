@@ -1,15 +1,15 @@
 // initializes the html and handles calls from the user interface
 // to the feelgorythm object
 
-function App(canvasId) {
+var Algorithm3dApp = function(canvasId) {
 	this._canvasId = canvasId;
 	this.feel = undefined;
-}
+};
 
-App.prototype = {
+Algorithm3dApp.prototype = {
 
-	initFeelgoRythm: function() {
-		this.feel = new FeelgoRythm(this._canvasId);
+	initBabylonEngine: function() {
+		this.feel = new BabylonEngine(this._canvasId);
 		this.feel.initBabylon();
 		this.feel.loadTextures();
 		this.feel.initScene();
@@ -32,22 +32,25 @@ App.prototype = {
 
 		$('.app_menu').click( function() {
 
+			var selected_sidebar = '#model_menu';
+
 			if (this.id == 'btn_model' ) {
-				var selected_sidebar = '#model_menu';
+				selected_sidebar = '#model_menu';
 			}
 
-			if (this.id == 'btn_settings' ) {
-				var selected_sidebar = '#settings_menu';
+			else if (this.id == 'btn_settings' ) {
+				selected_sidebar = '#settings_menu';
 			}
 
-			if (this.id == 'btn_code' ) {
-				var selected_sidebar = '#code_menu';
+			else if (this.id == 'btn_code' ) {
+				selected_sidebar = '#code_menu';
 			}
 
-			if (this.id == 'btn_main' ) {
+			else if (this.id == 'btn_main' ) {
 				// $('.ui.sidebar').sidebar('hide');
 				// code here
 			}
+
 
 			if($(selected_sidebar).hasClass('active')) {
 				$('.ui.sidebar').sidebar('hide');
@@ -153,7 +156,7 @@ App.prototype = {
 		this._initSettingsDebug();
 	},
 
-	_initSettingsDebug: function(feel) {
+	_initSettingsDebug: function() {
 		var feel = this.feel;
 		$('#btn_debug').click(function() {
 			feel.dumpDebug();
@@ -196,19 +199,20 @@ App.prototype = {
 	},
 
 	_populateSettingsDropDowns: function() {
+		var i = 0;
 		//setup Skybox dropdown box
-		for(var i = 0; i < SkyBoxThemes.length; i++) {
+		for(i = 0; i < SkyBoxThemes.length; i++) {
 			$('#dd_skybox .menu').append("<div class='item' data-value='" + i + "'>" + SkyBoxThemes[i].name + " </div>");
 
 		}
 		// fill ground texture dropdown 
-		for(var i = 0; i < GroundThemes.length; i++) {
+		for(i = 0; i < GroundThemes.length; i++) {
 			$('#dd_groundTexture .menu').append("<div class='item' data-value='" + i + "'>" + GroundThemes[i].name + " </div>");
 
 		}
 
 		// fill graph themes dropdown 
-		for(var i = 0; i < GraphThemes.length; i++) {
+		for(i = 0; i < GraphThemes.length; i++) {
 			$('#dd_graphThemes .menu').append("<div class='item' data-value='" + i + "'>" + GraphThemes[i].name + " </div>");
 
 		}
@@ -280,7 +284,7 @@ App.prototype = {
 		 
 		//TextArea Formating
 		var textArea = document.getElementById('algoArea');
-		var TextArea = new algoArea(textArea);
+		var TextArea = new AlgoArea(textArea);
 		TextArea.createArea();
 		$(textArea).prop('readonly', true);
 	}
@@ -292,8 +296,8 @@ App.prototype = {
 /*main function*/
 $( document ).ready( function() {
 
-	var app = new App('renderCanvas');
-	app.initFeelgoRythm();
+	var app = new Algorithm3dApp('renderCanvas');
+	app.initBabylonEngine();
 	app.feel.initGraphModel();	
 	app.initGraphModelMenus();
  

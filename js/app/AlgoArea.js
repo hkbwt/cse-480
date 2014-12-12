@@ -1,9 +1,9 @@
-var algoArea = function(algoID){
+var AlgoArea = function(algoID){
 	this.algoID = algoID;
 	thisObject = this;
 }
 
-algoArea.prototype = {
+AlgoArea.prototype = {
 	createArea: function(){
 		$(thisObject.algoID).linedtextarea();
 	},

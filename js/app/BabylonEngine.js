@@ -2,32 +2,36 @@
 *   "We want you to feel the algorithm"
 */
 
-var FeelgoRythm = function(documentId) {
-    thisFeelGoRythm = this;
-    console.log(thisFeelGoRythm);
-
+var BabylonEngine = function(documentId) {
+    thisFeelGoRythm          = this;
     //main babylonjs componets
-    this.documentId          = documentId;
-    this.canvas              = undefined;
+    this._documentId         = documentId;
+    this._canvas             = undefined;
     this.engine              = undefined;
     this.scene               = undefined;
     
     
     //app variables
+    //
+    // 3d model variable
     this.model               = undefined;
-    this.currentGraphTheme   = "Halloween";
-    this.currentSkybox       = "alien";
-    this.currentGroundTheme  = "grid-me";
-    this.currentVertexSize   = "medium";
+    
+    //current themes
+    this.currentGraphTheme  = "Halloween";
+    this.currentSkybox      = "alien";
+    this.currentGroundTheme = "grid-me";
+    this.currentVertexSize  = "medium";
+    
+    //model options
     this.bDisplayGraphValues = false;
     this.bEnableTutorial     = false;
     
     //asset paths
-    this.skyboxTexturePath   = "textures/skybox/";
-    this.groundTexturePath   = "textures/ground/";
+    this._SKYBOXTEXTUREPATH  = "textures/skybox/";
+    this._GROUNDTEXTUREPATH  = "textures/ground/";
 };
 
-FeelgoRythm.prototype = {
+BabylonEngine.prototype = {
 
     initCamera: function() {
         this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
@@ -36,17 +40,17 @@ FeelgoRythm.prototype = {
         
         this.camera.lowerRadiusLimit = 20;
         this.camera.upperRadiusLimit = 650;
-        this.camera.upperBetaLimit = 0.334 * Math.PI;
-        this.camera.upperAlphaLimit = Math.PI;
-        this.camera.maxZ = 2000;
+        this.camera.upperBetaLimit   = 0.334 * Math.PI;
+        this.camera.upperAlphaLimit  = Math.PI;
+        this.camera.maxZ             = 2000;
 
-        this.camera.attachControl(this.canvas, false);
+        this.camera.attachControl(this._canvas, false);
     },
 
     initBabylon: function() {
 
-        this.canvas = document.getElementById(this.documentId);
-        this.engine = new BABYLON.Engine(this.canvas, true);
+        this._canvas = document.getElementById(this._documentId);
+        this.engine = new BABYLON.Engine(this._canvas, true);
         this.scene = new BABYLON.Scene(this.engine);
         this.initMoveFunction();
 
@@ -109,7 +113,7 @@ FeelgoRythm.prototype = {
             skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
             skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-                                            this.skyboxTexturePath + currSkyboxTexture.path, this.scene);
+                                            this._SKYBOXTEXTUREPATH + currSkyboxTexture.path, this.scene);
 
             skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
@@ -120,7 +124,7 @@ FeelgoRythm.prototype = {
         for (var theme = 0; theme < GroundThemes.length; theme++) {
             var currGroundTheme = GroundThemes[theme];
             var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
-            var texture = new BABYLON.Texture(this.groundTexturePath + currGroundTheme.filename, this.scene);
+            var texture = new BABYLON.Texture(this._GROUNDTEXTUREPATH + currGroundTheme.filename, this.scene);
             texture.uScale = 1.0;
             texture.vScale = 1.5;
 

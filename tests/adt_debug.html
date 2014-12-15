@@ -19,16 +19,11 @@ graph.addEdge(1,3);
 graph.addEdge(3,1);
 graph.addEdge(4,6);
 graph.addEdge(7,8);
+graph.removeVertexById(8);
+graph.addVertex();
 
-graph.removeEdgeByValue(6, 4);
-graph.removeEdgeByName("edge_7_8");
-console.log(graph.printGraph());
+graph.createRandomGraph(100, 25);
 
-graph.createRandomGraph(26, 5);
-console.log(graph.printGraph());
-
-
-graph.clearGraph();
 
 console.log(graph.printGraph());
 

@@ -1,7 +1,7 @@
 var AlgoArea = function(algoID){
 	this.algoID = algoID;
 	thisObject = this;
-}
+};
 
 AlgoArea.prototype = {
 	createArea: function(){
@@ -34,4 +34,4 @@ AlgoArea.prototype = {
 	setText: function(text){
 		$(thisObject.algoID).val(text); 
 	}
-}
+};

@@ -1,9 +1,5 @@
-/*
-*   "We want you to feel the algorithm"
-*/
 
 var BabylonEngine = function(documentId) {
-    thisFeelGoRythm          = this;
     //main babylonjs componets
     this._documentId         = documentId;
     this._canvas             = undefined;
@@ -15,12 +11,13 @@ var BabylonEngine = function(documentId) {
     //
     // 3d model variable
     this.model               = undefined;
+    this.groundName          = "ground";
     
     //current themes
-    this.currentGraphTheme  = "Halloween";
-    this.currentSkybox      = "alien";
-    this.currentGroundTheme = "grid-me";
-    this.currentVertexSize  = "medium";
+    this.currentGraphTheme   = "Halloween";
+    this.currentSkybox       = "alien";
+    this.currentGroundTheme  = "grid-me";
+    this.currentVertexSize   = "medium";
     
     //model options
     this.bDisplayGraphValues = false;
@@ -29,11 +26,9 @@ var BabylonEngine = function(documentId) {
     //asset paths
     this._SKYBOXTEXTUREPATH  = "textures/skybox/";
     this._GROUNDTEXTUREPATH  = "textures/ground/";
-};
 
-BabylonEngine.prototype = {
 
-    initCamera: function() {
+    this.initCamera = function() {
         this.camera = new BABYLON.ArcRotateCamera("ArcRotCamera",
                      0.0, 0.0, 200.0,
                      new BABYLON.Vector3(0, 0, 0), this.scene);
@@ -45,9 +40,9 @@ BabylonEngine.prototype = {
         this.camera.maxZ             = 2000;
 
         this.camera.attachControl(this._canvas, false);
-    },
+    };
 
-    initBabylon: function() {
+    this.initBabylon = function() {
 
         this._canvas = document.getElementById(this._documentId);
         this.engine = new BABYLON.Engine(this._canvas, true);
@@ -55,18 +50,18 @@ BabylonEngine.prototype = {
         this.initMoveFunction();
 
         window.addEventListener("resize", function () {
-                thisFeelGoRythm.engine.resize();    
-        }); 
-    },
+                this.engine.resize();    
+        }.bind(this)); 
+    };
 
-    loadTextures: function() {
+    this.loadTextures = function() {
 
         this.loadGraphThemeMaterials();
         this.loadSkyboxTextureThemes();
         this.loadGroundThemes();
-    },
+    };
 
-    initScene: function() {
+    this.initScene = function() {
         
         this.initCamera();
         this.initGround();
@@ -75,23 +70,23 @@ BabylonEngine.prototype = {
 
         //resize loop for web browser
         this.engine.runRenderLoop(function() {
-            thisFeelGoRythm.scene.render();
-        });     
-    },
+            this.scene.render();
+        }.bind(this));     
+    };
 
-    initGround: function() {
+    this.initGround = function() {
         var ground = new BABYLON.Mesh.CreateGround( "ground", 1000, 1000, 8, this.scene);
         ground.material = this.scene.getMaterialByID("mat_" + this.currentGroundTheme);
-    }, 
+    };
 
-    initSkyBox: function() {
+    this.initSkyBox = function() {
 
         var skybox = BABYLON.Mesh.CreateBox("skybox", 2000.0, this.scene);
         skybox.material = this.scene.getMaterialByID("mat_" + this.currentSkybox);
         skybox.infiniteDistance = true;
-    },
+    };
 
-    loadGraphThemeMaterials: function() {
+    this.loadGraphThemeMaterials = function() {
 
         for(var theme = 0; theme < GraphThemes.length; theme++) {
             var currTheme = GraphThemes[theme];
@@ -100,9 +95,9 @@ BabylonEngine.prototype = {
                 mat.diffuseColor = Palettes[currTheme.name][color];
             }
         }
-    },
+    };
 
-    loadSkyboxTextureThemes: function() {
+    this.loadSkyboxTextureThemes = function() {
         
         for (var theme = 0; theme < SkyBoxThemes.length; theme++) {
             var currSkyboxTexture = SkyBoxThemes[theme];
@@ -118,9 +113,9 @@ BabylonEngine.prototype = {
             skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
         }
-    },
+    };
 
-    loadGroundThemes: function() {
+    this.loadGroundThemes = function() {
         for (var theme = 0; theme < GroundThemes.length; theme++) {
             var currGroundTheme = GroundThemes[theme];
             var groundMaterial = new BABYLON.StandardMaterial("mat_" + currGroundTheme.name, this.scene);
@@ -143,128 +138,128 @@ BabylonEngine.prototype = {
          var multimat = new BABYLON.MultiMaterial("ground_mat", this.scene);
          multimat.subMaterials.push(whiteMaterial);
          multimat.subMaterials.push(blackMaterial);
-    },
+    };
 
-    initDefaultLights: function() {
+    this.initDefaultLights = function() {
         var light = new BABYLON.HemisphericLight("light_" + this.scene.lights.length,
         new BABYLON.Vector3(0, 1, 0), this.scene);
         light.intensity = 0.7;
         this.lightcount++;
-    },
+    };
 
-    initGraphModel: function() {
+    this.initGraphModel = function() {
         var index = this._getIndexOfObjectArray(this.currentGraphTheme, GraphThemes);
         this.model = new GraphModel( this.scene, 0, GraphThemes[index].colortheme, this.currentVertexSize);
-    },
+    };
 
-    updateSkybox: function(index) {
+    this.updateSkybox = function(index) {
         var newSkyBoxTheme = SkyBoxThemes[index];
-        var skyboxMesh = thisFeelGoRythm.scene.getMeshByName("skybox");
-        skyboxMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
-    },
+        var skyboxMesh = this.scene.getMeshByName("skybox");
+        skyboxMesh.material = this.scene.getMaterialByID("mat_" + newSkyBoxTheme.name);
+    };
 
-    updateGround: function(index) {
+    this.updateGround = function(index) {
         console.log(index);
 
 
         var newGroundTheme = GroundThemes[index];
         console.log(newGroundTheme);
 
-        var groundMesh = thisFeelGoRythm.scene.getMeshByName("ground");
-        console.log(thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name));
-        groundMesh.material = thisFeelGoRythm.scene.getMaterialByID("mat_" + newGroundTheme.name);
-    },
-    
-    dumpDebug: function() {
-        console.log(this);
-    },
+        var groundMesh = this.scene.getMeshByName("ground");
+        console.log(this.scene.getMaterialByID("mat_" + newGroundTheme.name));
+        groundMesh.material = this.scene.getMaterialByID("mat_" + newGroundTheme.name);
+    };
 
-    _getIndexOfObjectArray: function(name, objArray){
+    this._getIndexOfObjectArray = function(name, objArray){
         for(var i = 0; i < objArray.length; i++) {
                 if(objArray[i].name == name) return i;
         }
         return -1;
-    },
+    };
 
-    getGroundPosition: function () {
+    this.getGroundPosition = function () {
         // Use a predicate to get position on the ground
-        var pickinfo = thisFeelGoRythm.scene.pick(
-                thisFeelGoRythm.scene.pointerX,
-                thisFeelGoRythm.scene.pointerY, 
+        var pickinfo = this.scene.pick(
+                this.scene.pointerX,
+                this.scene.pointerY, 
                 function (mesh) { 
-                    return mesh == thisFeelGoRythm.scene.meshes[0]; 
-             });
+                    return mesh == this.scene.meshes[0]; 
+             }.bind(this));
 
         if (pickinfo.hit) { return pickinfo.pickedPoint; }
         return null;
-    },
+    };
     
-    onPointerDown: function(evt){
-        var gmodel = thisFeelGoRythm.model;
+    this.onPointerDown = function(evt){
+        var gmodel = this.model;
+        console.log(gmodel);
         if(evt.button !== 0){ return; }
 
-        var pickInfo = thisFeelGoRythm.scene.pick(
-                thisFeelGoRythm.scene.pointerX, 
-                thisFeelGoRythm.scene.pointerY, 
+        var pickInfo = this.scene.pick(
+                this.scene.pointerX, 
+                this.scene.pointerY, 
                 function (mesh) { 
-                    return (mesh !== thisFeelGoRythm.scene.meshes[0] &&
-                            mesh !== thisFeelGoRythm.scene.meshes[1]); 
-            });
+                    return (mesh !== this.scene.meshes[0] &&
+                            mesh !== this.scene.meshes[1]); 
+            }.bind(this));
 
         if (pickInfo.pickedMesh !== null &&
             pickInfo.pickedMesh.matchesTagsQuery("vertex") &&
             pickInfo.hit) {
 
             gmodel.setSelectedVertex(pickInfo.pickedMesh);
-            gmodel.startingPoint = thisFeelGoRythm.getGroundPosition(evt);
+            gmodel.startingPoint = this.getGroundPosition(evt);
 
             if (gmodel.startingPoint) { 
                 // we need to disconnect camera from canvas
                 setTimeout(function () {
-                        thisFeelGoRythm.scene.cameras[0].detachControl(thisFeelGoRythm.engine.getRenderingCanvas());
-                }, 0);
+                        this.scene.cameras[0].detachControl(this.engine.getRenderingCanvas());
+                }.bind(this), 0);
             }
-        }
-        
-    },
+        }    
+    };
 
-    onPointerUp: function () {
-        var gmodel = thisFeelGoRythm.model;
+    this.onPointerUp = function () {
+        var gmodel = this.model;
 
         if (gmodel.startingPoint) {
-            thisFeelGoRythm.scene.cameras[0].attachControl(
-                thisFeelGoRythm.engine.getRenderingCanvas(), true);
+            this.scene.cameras[0].attachControl(
+                this.engine.getRenderingCanvas(), true);
             
             gmodel.startingPoint = null;
             return;
         }
-    },
+    };
 
-    onPointerMove: function (evt) {
-        var gmodel = thisFeelGoRythm.model;
+    this.onPointerMove = function (evt) {
+        var gmodel = this.model;
 
         if (!gmodel.startingPoint) {
             return;
         }
 
-        var currentPointerPosition = thisFeelGoRythm.getGroundPosition(evt);
+        var currentMousePosition = this.getGroundPosition(evt);
 
-        if (!currentPointerPosition) {
+        if (!currentMousePosition) {
             return;
         }
 
-        var diff = currentPointerPosition.subtract(gmodel.startingPoint);
+        var diff = currentMousePosition.subtract(gmodel.startingPoint);
         var selectedMesh = gmodel.getSelectedVertex();
         
         selectedMesh.position.addInPlace(diff);
         gmodel.updateEdges(selectedMesh);
-        gmodel.startingPoint = currentPointerPosition;
-    },
+        gmodel.startingPoint = currentMousePosition;
+    };
 
-    initMoveFunction: function(){
-        this.engine.getRenderingCanvas().addEventListener("pointerdown", thisFeelGoRythm.onPointerDown, false);
-        this.engine.getRenderingCanvas().addEventListener("pointerup", thisFeelGoRythm.onPointerUp, false);
-        this.engine.getRenderingCanvas().addEventListener("pointermove", thisFeelGoRythm.onPointerMove, false);
-    }
-    
+    this.initMoveFunction = function(){
+        this.engine.getRenderingCanvas().addEventListener("pointerdown", this.onPointerDown.bind(this), false);
+        this.engine.getRenderingCanvas().addEventListener("pointerup", this.onPointerUp.bind(this), false);
+        this.engine.getRenderingCanvas().addEventListener("pointermove", this.onPointerMove.bind(this), false);
+    };
+
+    this.dumpDebug = function() {
+        console.log(this);
+    };
+
 };

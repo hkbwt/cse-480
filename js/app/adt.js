@@ -160,7 +160,7 @@ var  Graph = function() {
     };
 
    	this.removeEdgeByValue = function(v, w){
-   		for( var index = 0; index < this_edgeList.length; index++) {
+   		for( var index = 0; index < this._edgeList.length; index++) {
    			var edge = this._edgeList[index];
 
    			if(edge.isEdge(v,w)){
@@ -178,7 +178,7 @@ var  Graph = function() {
 	};
 
 	this.removeEdgeByName = function(name) {
-		for( var index = 0; index < this_edgeList.length; index++) {
+		for( var index = 0; index < this._edgeList.length; index++) {
 			var edge = this._edgeList[index];
 
 			if(edge.name == name) {
@@ -245,9 +245,12 @@ var  Graph = function() {
     };
 
     this.removeAllEdges = function() {
-    	for(var vertex in this._vertexList) {
+    	for(var vertexId = 0; vertexId < this._vertexList.length; vertexId++) {
+    		var vertex = this._vertexList[vertexId];
+
     		while(vertex.adjVertIdList.length > 0){
     			vertex.adjVertIdList.pop();
+
     		}
     	}
 
@@ -257,7 +260,7 @@ var  Graph = function() {
     	}
     };
 
-    this.ClearGraph = function() {
+    this.clearGraph = function() {
     	while(this._vertCount > 0 ) {
     		this._vertexList.pop();
     		this._vertCount--;
@@ -269,11 +272,11 @@ var  Graph = function() {
     	}
     };
 
-    this.createRandomGraph= function(ubVertexNumber, ubEdgeNumber) {
+    this.createRandomGraph = function(ubVertexNumber, ubEdgeNumber) {
     	var edgeCount = Math.floor((Math.random() * ubEdgeNumber) + 1);
     	var vertCount = Math.floor((Math.random() * ubVertexNumber) + 1);
 
-    	this.ClearGraph();
+    	this.clearGraph();
 
     	while(vertCount > 0) {
     		var value = Math.floor((Math.random() * 100) + 1);

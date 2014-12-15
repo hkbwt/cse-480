@@ -26,18 +26,16 @@
  */
 
 
-var  Graph = function(vertCount) {
+var  Graph = function() {
 	this._vertCount  = 0;
 	this._edgeCount  = 0;
 	this._vertexList = [];
 	this._edgeList   = [];
 
-	this._init(vertCount);
+	this.init = function(count) {
 
-	this._init = function(count) {
-		var total = count;
 		while(count > 0) {
-			this.addVertex(total - count);
+			this.addVertex();
 			count--;
 		}
 	};
@@ -55,8 +53,8 @@ var  Graph = function(vertCount) {
 	};
 
 	this.getVertexById = function(vertexId) {
-		for( var vertex in this._vertexList ) {
-			if (vertex.id == id) { return vertex; }
+		for( var vertex = 0; vertex < this._vertexList.length; vertex++ ) {
+			if (this._vertexList[vertex].id == vertexId) { return this._vertexList[vertex]; }
 		}
 		return null;
 	};
@@ -101,7 +99,7 @@ var  Graph = function(vertCount) {
 
 	this.getEdgeIdByName = function(name) {
 		var parts = name.split("_");
-		return [parseInt(parts[0]), parseInt(parts[1])];
+		return [{v: parseInt(parts[0])}, {w: parseInt(parts[1])}];
 	};
 
 	////==================================================
@@ -111,15 +109,14 @@ var  Graph = function(vertCount) {
 	this.addVertex = function(value) {
 		
     	if(typeof(value) == "undefined"){
-    		value = this._vertexCount;
+    		value = this._vertCount;
     	}
     	var name = this.getVertexNameById(this._vertCount);
 
     	var vertex = new GraphVertex(this._vertCount, name, value);
     	this._vertexList.push(vertex);
-    	this._vertexCount++;
+    	this._vertCount++;
     };
-
 
 	this.removeVertexById = function(vertexId){
 		var vertex = this.getVertexById(vertexId);
@@ -136,6 +133,7 @@ var  Graph = function(vertCount) {
 		for(var index = 0; index < this._vertexList.length; index++) {
 			if (this._vertexList[index].id == vertexId) {
 				this._vertexList.splice(index, 1);
+				this._vertCount--;
 				break;
 			}
 		}
@@ -146,14 +144,13 @@ var  Graph = function(vertCount) {
 		this.removeVertexById(id);
 	};
 
-
 	this.addEdge = function(v,w) {
 		if(this.hasEdgeById(v, w)) { return; }
 
 		var fromVertex = this.getVertexById(v);
 		var toVertex = this.getVertexById(w);
 
-		var edge = new GraphEdge(this.getEdgeNameById(v,w), fromVertex, toVertex, 1.0);
+		var edge = new GraphEdge(this.getEdgeNameById(v,w), v, w, 1.0);
 		this._edgeList.push(edge);
 
 	    fromVertex.addAdjacentVertex(w);
@@ -174,6 +171,7 @@ var  Graph = function(vertCount) {
    				from.removeAdjacentVertex(v);
 
    				this._edgeList.splice(index,1);
+   				this._edgeCount--;
    				break;
    			}
    		}
@@ -191,6 +189,7 @@ var  Graph = function(vertCount) {
 				from.removeAdjacentVertex(edge.v);
 
 				this._edgeList.splice(index,1);
+				this._edgeCount--;
 				break;
 			}
 		}
@@ -199,7 +198,6 @@ var  Graph = function(vertCount) {
 	////==================================================
 	//	Helper Methods
 	////==================================================
-
 
 	this.getVertexCount = function() {
 		return this._vertCount;
@@ -210,15 +208,15 @@ var  Graph = function(vertCount) {
 	};
 
    	this.hasEdgeById = function(v,w){
-   		for( var edge in this._edgeList) {
-   			if(edge.isEdge(v, w)) {
+   		for( var edgeId = 0; edgeId < this._edgeList.length; edgeId++) {
+   			if(this._edgeList[edgeId].isEdge(v, w)) {
    				return true;
    			}
    		}
    		return false;
     };
 
-    tihs.hasEdgeByName = function(name) {
+    this.hasEdgeByName = function(name) {
     	for( var edge in this._edgeList) {
     		if(edge.name == name) {
     			return true;
@@ -226,23 +224,75 @@ var  Graph = function(vertCount) {
     	}
     	return false;
     };
-
 	
 	this.printGraph = function() {
 	    var msg = "";
-	    for(var vertex in this._vertexList) {
+
+	    for(var vertexId = 0; vertexId < this._vertexList.length; vertexId++ ) {
+	    	var vertex = this._vertexList[vertexId];
 	    	msg += vertex.toString();
 	    }
 
-	    for(var edge in this._edgeList) {
+	    for(var edgeId = 0; edgeId < this._edgeList.length; edgeId++ ) {
+	    	var edge = this._edgeList[edgeId];
 	    	msg += edge.toString();
 	    }
+
+	    msg +=  "\n\n" + "Total Vertices: " + this._vertCount + "\n" +
+	    	   "Total Edges: " + this._edgeCount + "\n";
 
 	    return msg;
     };
 
-};
+    this.removeAllEdges = function() {
+    	for(var vertex in this._vertexList) {
+    		while(vertex.adjVertIdList.length > 0){
+    			vertex.adjVertIdList.pop();
+    		}
+    	}
 
+    	while(this._edgeCount > 0 ) {
+    		this._edgeList.pop();
+    		this._edgeCount--;
+    	}
+    };
+
+    this.ClearGraph = function() {
+    	while(this._vertCount > 0 ) {
+    		this._vertexList.pop();
+    		this._vertCount--;
+    	}
+
+    	while(this._edgeCount > 0){
+    		this._edgeList.pop();
+    		this._edgeCount--;
+    	}
+    };
+
+    this.createRandomGraph= function(ubVertexNumber, ubEdgeNumber) {
+    	var edgeCount = Math.floor((Math.random() * ubEdgeNumber) + 1);
+    	var vertCount = Math.floor((Math.random() * ubVertexNumber) + 1);
+
+    	this.ClearGraph();
+
+    	while(vertCount > 0) {
+    		var value = Math.floor((Math.random() * 100) + 1);
+    		this.addVertex(value);
+    		vertCount--;
+    	}
+
+    	while(edgeCount > 0) {
+    		var v = Math.floor((Math.random() * (this._vertCount - 1) ));
+    		var w = Math.floor((Math.random() * (this._vertCount - 1) ));
+
+    			if((w != v) && !this.hasEdgeById(v, w)) {
+    				this.addEdge(v,w);
+    				edgeCount--;
+    			}
+    	}
+    };
+
+};
 
 
 var GraphVertex = function(id, name, value){
@@ -273,8 +323,8 @@ var GraphVertex = function(id, name, value){
 	this.toString = function() {
 		var adjString = "Adjacent Vertices:";
 
-		for(var id in this.adjVertIdList) {
-			adjString += " " + id.toString();
+		for(var id = 0; id < this.adjVertIdList.length; id++) {
+			adjString += " " + this.adjVertIdList[id].toString();
 		}
 
 		return "===============" + this.name + "================\n" +
@@ -282,11 +332,10 @@ var GraphVertex = function(id, name, value){
 				"value: "  + this.value.toString() + "\n" +
 				"marked: " + this.marked.toString() + "\n" +
 				adjString + "\n" +
-				"=================================================";
+				"========================================" + "\n";
 
 
 	};
-	
 };
 
 var GraphEdge = function(name, v, w, weight) {
@@ -307,13 +356,12 @@ var GraphEdge = function(name, v, w, weight) {
 	};
 
 	this.toString = function() {
-		return "===============" + this.name + "===============" +
+		return "===============" + this.name + "===============" + "\n" +
 		"v: " + this.v.toString() + "\n" +
 		"w: " + this.w.toString() + "\n" +
 		"weight: " + this.weight.toString() + "\n" +
-		"======================================================";
+		"========================================" + "\n";
 	};
-
 };
 
 

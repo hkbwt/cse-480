@@ -7,6 +7,14 @@
 *
 *
 *********************************************************/
+/*
+	the Graph model uses the Vetex and Edge Objects to keep track of
+	the respecting inside a graph. each vertex object has is identified with
+	a primary key id and has with it the model name and most importantly the adj array.
+	that holds for the vertex class the ids of all known adjcent vertices. the edge class
+	keep track of two ids w and v each the id for the two connected vertices.
+ */
+
 
 var  Graph = function(vertCount) {
 	this._vertCount  = 0;
@@ -15,7 +23,6 @@ var  Graph = function(vertCount) {
 	this._edgeList   = [];
 
 	this._init(vertCount);
-
 
 	this._init = function(count) {
 		var total = count;
@@ -28,8 +35,7 @@ var  Graph = function(vertCount) {
 	////==================================================
 	//  		access vertex objects
 	////==================================================
-
-{{{
+	
 	this.getVertexByName = function(name){
 
 		for( var vertex in this._vertexList ) {
@@ -60,14 +66,12 @@ var  Graph = function(vertCount) {
 
 		return edge;
 	};
-}}}
 
     ////==================================================
     // defines the relationship between names and ids
     // for both vetices and edges
     ////==================================================
 
-{{{
 	this.getVertexNameById = function(vertexId) {
 		return "vertex_" + vertexId;
 	};
@@ -88,13 +92,10 @@ var  Graph = function(vertCount) {
 		return [parseInt(parts[0]), parseInt(parts[1])];
 
 	};
-}}}
 
 	////==================================================
 	//	Add and Remove Vertices and Edges from Graph Class
 	////==================================================
-
-{{{
 
 	this.addVertex = function(value) {
 		
@@ -121,8 +122,6 @@ var  Graph = function(vertCount) {
 	};
 
 
-
-
 	this.addEdge = function(v,w) {
 		var fromVertex = this.getVertexById(v);
 		var toVertex = this.getVertexById(w);
@@ -142,13 +141,12 @@ var  Graph = function(vertCount) {
 		this.vertexQueue[vertice[1]].removeAdjacentVertex(vertice[0]);
 		this.edgeCount--;
 	};
-}}}
 
 	////==================================================
 	//	Helper Methods
 	////==================================================
 
-{{{	
+
 	this.getVertexCount = function() {
 		return this._vertCount;
 	};
@@ -187,7 +185,6 @@ var  Graph = function(vertCount) {
 	    }
 	        return msg;
     };
-}}}
 
 };
 
@@ -222,6 +219,8 @@ var GraphVertex = function(id, name, value){
 
 var GraphEdge = function(name, v, w, weight) {
 	this.name = name;
+
+	//ids of vertices this edge connects
 	this.v = v;
 	this.w = w;
 	this.weight = weight;

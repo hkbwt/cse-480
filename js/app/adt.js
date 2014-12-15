@@ -9,10 +9,20 @@
 *********************************************************/
 /*
 	the Graph model uses the Vetex and Edge Objects to keep track of
-	the respecting inside a graph. each vertex object has is identified with
-	a primary key id and has with it the model name and most importantly the adj array.
-	that holds for the vertex class the ids of all known adjcent vertices. the edge class
+	the respecting inside of a graph. each vertex object is identified with
+	a primary key id and model name which is a string of the primary id and the adj array.
+	that holds for the vertex ids of all known adjcent vertices. the edge class
 	keep track of two ids w and v each the id for the two connected vertices.
+
+	the id is converted into a string for the name of the model that will repersented.
+	helper functions are used to make the conversions
+
+	In the undirected graph edge_2_3 is the same as edge_3_2. only one will be saved in
+	the edge array. So to retrive an edge you must check if either case is in the edge arrary.
+
+	edge names will always have the smaller vertex id first to maintain consistancey 
+
+	Undirected Graph
  */
 
 
@@ -50,6 +60,7 @@ var  Graph = function(vertCount) {
 		}
 		return null;
 	};
+
 	this.getEdgeByName = function(name) {
 		for( var edge in this._edgeList ) {
 			if (edge.name == edge) { return edge; }
@@ -76,21 +87,21 @@ var  Graph = function(vertCount) {
 		return "vertex_" + vertexId;
 	};
 
-
 	this.getVertexIdByName = function(name) {
 		var parts = name.split("_");
 		return parseInt(parts[1]);
-
 	};
 
 	this.getEdgeNameById = function(vertexIdOne, vertexIdTwo) {
-		return "edge" + '_' + vertexIdOne + "_" + vertexIdTwo;
+		if(vertexIdOne < vertexIdTwo) {
+			return "edge" + '_' + vertexIdOne + "_" + vertexIdTwo;
+		}
+		return "edge" + '_' + vertexIdTwo + "_" + vertexIdOne;
 	};
 
 	this.getEdgeIdByName = function(name) {
 		var parts = name.split("_");
 		return [parseInt(parts[0]), parseInt(parts[1])];
-
 	};
 
 	////==================================================
@@ -104,42 +115,85 @@ var  Graph = function(vertCount) {
     	}
     	var name = this.getVertexNameById(this._vertCount);
 
-    	var _vertex = new GraphVertex(this._vertCount, name, value);
-    	this._vertexList.push(_vertex);
+    	var vertex = new GraphVertex(this._vertCount, name, value);
+    	this._vertexList.push(vertex);
     	this._vertexCount++;
     };
 
 
-	this.removeVertex = function(v){
-		var a = [];
-		for( var i = 0; i< this.vertexQueue.length; i++){
-			if(this.vertexQueue[i].name != this.getVertexIdByName(v)){
-				a.push(this.vertexQueue[i]);
+	this.removeVertexById = function(vertexId){
+		var vertex = this.getVertexById(vertexId);
+
+		if(vertex === null) { return;}
+
+		//remove adjacent edges
+		var v = vertex.id;
+		for( var w in vertex.adjVertIdList  ) {
+			this.removeEdgeByValue(v, w);
+		}
+
+		//remove vertex
+		for(var index = 0; index < this._vertexList.length; index++) {
+			if (this._vertexList[index].id == vertexId) {
+				this._vertexList.splice(index, 1);
+				break;
 			}
 		}
-		this.vertexQueue = a;
-		this.vertCount--;
+	};
+
+	this.removeVertexByName = function(name) {
+		var id = this.getVertexIdByName(name);
+		this.removeVertexById(id);
 	};
 
 
 	this.addEdge = function(v,w) {
+		if(this.hasEdgeById(v, w)) { return; }
+
 		var fromVertex = this.getVertexById(v);
 		var toVertex = this.getVertexById(w);
 
-		var _edge = new GraphEdge(this.getEdgeNameById(v,w), fromVertex, toVertex, 1.0);
-		this._edgeList.push(_edge);
+		var edge = new GraphEdge(this.getEdgeNameById(v,w), fromVertex, toVertex, 1.0);
+		this._edgeList.push(edge);
 
-	    fromVertex.adjacentVertexList.push(w);
-	    toVertex.adjacentVertexList.push(v);
+	    fromVertex.addAdjacentVertex(w);
+	    toVertex.addAdjacentVertex(v);
 
 	    this._edgeCount++;    
     };
 
-   	this.removeEdge = function(v){
-		var vertice = this.getEdgeIdByName(v);
-		this.vertexQueue[vertice[0]].removeAdjacentVertex(vertice[1]);
-		this.vertexQueue[vertice[1]].removeAdjacentVertex(vertice[0]);
-		this.edgeCount--;
+   	this.removeEdgeByValue = function(v, w){
+   		for( var index = 0; index < this_edgeList.length; index++) {
+   			var edge = this._edgeList[index];
+
+   			if(edge.isEdge(v,w)){
+   				var to = this.getVertexById(v);
+   				var from = this.getVertexById(w);
+
+   				to.removeAdjacentVertex(w);
+   				from.removeAdjacentVertex(v);
+
+   				this._edgeList.splice(index,1);
+   				break;
+   			}
+   		}
+	};
+
+	this.removeEdgeByName = function(name) {
+		for( var index = 0; index < this_edgeList.length; index++) {
+			var edge = this._edgeList[index];
+
+			if(edge.name == name) {
+				var to = this.getVertexById(edge.v);
+				var from = this.getVertexById(edge.w);
+
+				to.removeAdjacentVertex(edge.w);
+				from.removeAdjacentVertex(edge.v);
+
+				this._edgeList.splice(index,1);
+				break;
+			}
+		}
 	};
 
 	////==================================================
@@ -155,35 +209,36 @@ var  Graph = function(vertCount) {
 		return this._edgeCount;
 	};
 
-   	this.edgeExist = function(v,w){
-	    for(var i = 0; i< this.vertexQueue.length; i++){
-		if(this.vertexQueue[i] == v){
-			for(var j = i; j< this.vertexQueue.length; j++){
-				if(this.vertexQueue[j] == w){
-					return true;	
-				}
-			}
-		}
-	}
-	return false;
+   	this.hasEdgeById = function(v,w){
+   		for( var edge in this._edgeList) {
+   			if(edge.isEdge(v, w)) {
+   				return true;
+   			}
+   		}
+   		return false;
+    };
+
+    tihs.hasEdgeByName = function(name) {
+    	for( var edge in this._edgeList) {
+    		if(edge.name == name) {
+    			return true;
+    		}
+    	}
+    	return false;
     };
 
 	
 	this.printGraph = function() {
-	    var msg = " ";
-
-	    for(var i = 0; i < this.vertCount; i++) {
-	        msg += + i + " -> ";  
-
-	        for(var j = 0; j < this.vertCount; j++) {
-	            if(this.adjList[i][j] !== undefined) {
-	                msg += this.adjList[i][j] + ' ';
-	            }
-	        }
-
-	        msg += "<br>";
+	    var msg = "";
+	    for(var vertex in this._vertexList) {
+	    	msg += vertex.toString();
 	    }
-	        return msg;
+
+	    for(var edge in this._edgeList) {
+	    	msg += edge.toString();
+	    }
+
+	    return msg;
     };
 
 };
@@ -197,22 +252,39 @@ var GraphVertex = function(id, name, value){
 	this.marked        = false;
 
 	//vertex adjacency array of vertex ids
-	this.adjacentVertexList = [];
+	this.adjVertIdList = [];
 
 	this.addAdjacentVertex = function(vertexId) {
-		this.adjacentVertexList.push(vertexId);
+		this.adjVertIdList.push(vertexId);
 	};
 
 	this.removeAdjacentVertex = function(vertexId){
-		for(var curr = 0; curr < this.adjacentVertexList.length; curr++) {
-			var vertex = this.adjacentVertexList[curr];
+		for(var curr = 0; curr < this.adjVertIdList.length; curr++) {
+			var vertex = this.adjVertIdList[curr];
 			if(vertex.id == vertexId) {
-				this.adjacentVertexList.splice(curr, 1);
+				this.adjVertIdList.splice(curr, 1);
 				return true;
 			}
 		}
 
 		return false;		
+	};
+
+	this.toString = function() {
+		var adjString = "Adjacent Vertices:";
+
+		for(var id in this.adjVertIdList) {
+			adjString += " " + id.toString();
+		}
+
+		return "===============" + this.name + "================\n" +
+				"id: " + this.id.toString() + "\n" +
+				"value: "  + this.value.toString() + "\n" +
+				"marked: " + this.marked.toString() + "\n" +
+				adjString + "\n" +
+				"=================================================";
+
+
 	};
 	
 };
@@ -224,6 +296,24 @@ var GraphEdge = function(name, v, w, weight) {
 	this.v = v;
 	this.w = w;
 	this.weight = weight;
+
+	this.isEdge = function(v, w) {
+		if ((this.v == v && this.w == w) || 
+		   (this.v == w && this.w == v)) {
+		   	return true;
+		}
+
+		return false;
+	};
+
+	this.toString = function() {
+		return "===============" + this.name + "===============" +
+		"v: " + this.v.toString() + "\n" +
+		"w: " + this.w.toString() + "\n" +
+		"weight: " + this.weight.toString() + "\n" +
+		"======================================================";
+	};
+
 };
 
 

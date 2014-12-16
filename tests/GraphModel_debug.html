@@ -4,8 +4,30 @@
 <head>
 	<meta charset="UTF-8">
 	<title> Graph Model Object Debug </title>
+
+	<script type="text/javascript" src="../js/vendor/babylon.1.14.js"></script>
+	<script type="text/javascript" src="../js/vendor/hand.minified-1.3.8.js"></script>
+
 	<script type="text/javascript" src="../js/app/adt/Graph.js"></script>
 	<script type="text/javascript" src="../js/app/models/GraphModel.js"></script>
+
+	<style>
+	   html, body {
+	      overflow: hidden;
+	      width: 100%;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	   }
+
+	   #renderCanvas {
+	      width: 100%;
+	      height: 100%;
+	      touch-action: none;
+	   }
+	</style>
+
+
 </head>
 
 <body>
@@ -13,20 +35,65 @@
 <h1>Graph Model Object Debug</h1>
 <p>See Console log</p>
 
-<script>
+<canvas id="renderCanvas"></canvas>
 
-var graph = new GraphModel();
-graph.init(10);
-graph.addEdge(1,3);
-graph.addEdge(3,1);
-graph.addEdge(4,6);
-graph.addEdge(7,8);
-graph.removeVertexById(8);
-graph.addVertex();
+<script type="text/javascript">
+   var canvas = document.getElementById("renderCanvas");
+   var engine = new BABYLON.Engine(canvas, true);
 
-graph.createRandomGraph(100, 75);
-graph.clearAllMarks();
-console.log(graph.printGraph());
+   var createScene = function () {
+
+      var scene = new BABYLON.Scene(engine);
+      scene.clearColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+
+      var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(10, 10, 10), scene);
+      camera.setTarget(BABYLON.Vector3.Zero());
+      camera.attachControl(canvas, false);
+
+      var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+      light.intensity = 0.5;
+
+
+      var ground = BABYLON.Mesh.CreateGround("ground", 6, 6, 2, scene);
+
+
+      var graph = new GraphModel(scene);
+      graph.init(10);
+      graph.addEdge(1,3);
+      graph.addEdge(3,1);
+      graph.addEdge(4,6);
+      graph.addEdge(7,8);
+      graph.removeVertexById(8);
+      graph.addVertex();
+
+      graph.createRandomGraph(100, 75);
+      graph.clearAllMarks();
+      console.log(graph.printGraph());
+      console.log(graph);
+
+
+      // Leave this function
+      return scene;
+
+   };
+
+   // Now, call the createScene function that you just finished creating
+   var scene = createScene();
+
+   // Register a render loop to repeatedly render the scene
+   engine.runRenderLoop(function () {
+      scene.render();
+   });
+
+   // Watch for browser/canvas resize events
+   window.addEventListener("resize", function () {
+      engine.resize();
+   });
+
+
+
+/*TEST SUTFF*/
+
 
 </script>
 

@@ -1,7 +1,7 @@
 /********************************************************
 *
 *           Date: 9.18.2014
-*           Filename: GraphMdoel.js
+*           Filename: models.js
 *
 *
 *
@@ -28,17 +28,15 @@ var GraphStates = {
 
 var GraphModel = function (scene, vertices, theme, size) {    
 
-    //initialize Graph ADT
-    Graph.call(this);
+    Graph.call(this);           
+    this.scene          = scene;                              
+    this.theme          = theme;   
 
     if(typeof(size) == "undefined") {
         size = 5.0;
-    }  
-
-    this.scene          = scene;                              
-    this.theme          = theme;                            
+    }                           
     this.meshSize       = size;                                
-    this.meshSegments   = 10.0;                                
+    this.meshSegments   = 5.0;                                
     this.circleRaidus   = 10.0;
     
     this._selectedQueue = [];
@@ -46,5 +44,7 @@ var GraphModel = function (scene, vertices, theme, size) {
 
 GraphModel.prototype = new Graph();
 GraphModel.prototype.constructor = GraphModel;
+
+//var g = new Graph();
 
 

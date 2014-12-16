@@ -3,16 +3,17 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title> Debug adt.js </title>
-	<script type="text/javascript" src="../js/app/adt.js"></script>
+	<title> Graph Object Debug </title>
+	<script type="text/javascript" src="../js/app/adt/Graph.js"></script>
 </head>
 
 <body>
 
-<h1>Abstract Data Structure</h1>
+<h1>Graph Object Debug</h1>
 <p>See Console log</p>
 
 <script>
+
 var graph = new Graph();
 graph.init(10);
 graph.addEdge(1,3);
@@ -22,9 +23,8 @@ graph.addEdge(7,8);
 graph.removeVertexById(8);
 graph.addVertex();
 
-graph.createRandomGraph(100, 25);
-
-
+graph.createRandomGraph(100, 75);
+graph.clearAllMarks();
 console.log(graph.printGraph());
 
 </script>

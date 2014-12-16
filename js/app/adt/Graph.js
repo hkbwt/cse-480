@@ -1,7 +1,7 @@
 /********************************************************
 *
 *           Date: 9.10.2014
-*           Filename: adt.js
+*           Filename: Graph.js
 *
 *
 *
@@ -26,12 +26,13 @@
  */
 
 
-var  Graph = function() {
+var Graph = function() {
 	this._idCount    = 0;
 	this._vertexList = [];
 	this._edgeList   = [];
 
 	this.init = function(count) {
+		this.clearGraph();
 
 		while(count > 0) {
 			this.addVertex();
@@ -220,7 +221,7 @@ var  Graph = function() {
     };
 	
 	this.printGraph = function() {
-	    var msg = "";
+	    var msg = "=";
 
 	    for(var vertexId = 0; vertexId < this._vertexList.length; vertexId++ ) {
 	    	var vertex = this._vertexList[vertexId];
@@ -288,8 +289,13 @@ var  Graph = function() {
     	}
     };
 
-};
+    this.clearAllMarks = function() {
+    	for(var id = 0; id < this._vertexList.length; id++) {
+    		this._vertexList[id].mark = false;
+    	}
+    };
 
+};
 
 var GraphVertex = function(id, name, value){
 	this.id            = id;

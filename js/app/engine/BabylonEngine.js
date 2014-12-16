@@ -12,6 +12,7 @@ var BabylonEngine = function(documentId) {
     // 3d model variable
     this.model               = undefined;
     this.groundName          = "ground";
+    this.skyboxName          = "skybox";
     
     //current themes
     this.currentGraphTheme   = "Halloween";

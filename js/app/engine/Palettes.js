@@ -31,35 +31,35 @@ var Palettes = {
 
 */
 
-function ColorTheme(name, vertexMat, edgeMat, activeMatOne, activeMatTwo, selectedMat) {
+function ColorTheme(name, vertex, edge, active, selected, background) {
     this.name = name;
-    this.vertexMat = name + '_' + vertexMat;
-    this.edgeMat = name + '_' + edgeMat;
-    this.activeMatOne = name + '_' + activeMatOne;
-    this.activeMatTwo = name + '_' + activeMatTwo;
-    this.selectedMat = name + '_' + selectedMat;
+    this.vertex = vertex;
+    this.edge = edge;
+    this.active= active;
+    this.selected = selected;
+    this.background = background;
 
     return this;
 }
 
 
 var GraphThemes = [
-    {name: "Rainbowz", colortheme: new ColorTheme('Rainbowz','blue', 'orange', 'yellow', 'red', 'green')},
-    {name: "Halloween", colortheme: new ColorTheme('Halloween', 'white', 'orange', 'green', 'purple', 'black' )}
-];
+    new ColorTheme('Halloween',
+        Palettes.Rainbowz.yellow,
+        Palettes.Rainbowz.blue,
+        Palettes.Rainbowz.orange,
+        Palettes.Rainbowz.red,
+        Palettes.Rainbowz.green),
 
-var SkyBoxThemes = [
-    {name: "alien", path: "alien/alien"},
-    {name: "blood_sport", path: "blood_sport/blood_sport" },
-    {name: "calm",path: "calm/calm"},
-    {name: "canyon",path: "canyon/canyon"},
-    {name:"moon", path: "moon/moon"},
-    {name: "space2",path: "space2/space2"},
-    {name: "tron",path: "tron/tron"}
-];
+    new ColorTheme('Rainbowz',
+        Palettes.Halloween.black,
+        Palettes.Halloween.orange,
+        Palettes.Halloween.purple,
+        Palettes.Halloween.green,
+        Palettes.Halloween.white)
+];   
 
-
-var GroundThemes = [
+var GroundTextures = [
     {name: "gplay", filename: "gplay-1920x1080.png"},
     {name: "grid-me", filename: "grid-me-1920x1080.png"},
     {name: "subtle-grey", filename: "subtle-grey-1920x1080.png"},

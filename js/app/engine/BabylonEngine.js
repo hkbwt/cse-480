@@ -87,16 +87,6 @@ var BabylonEngine = function(documentId) {
         skybox.infiniteDistance = true;
     };
 
-    this.loadGraphThemeMaterials = function() {
-
-        for(var theme = 0; theme < GraphThemes.length; theme++) {
-            var currTheme = GraphThemes[theme];
-            for(var color in Palettes[currTheme.name]) {
-                var mat = new BABYLON.StandardMaterial( currTheme.name + "_"+ color.toString(), this.scene);
-                mat.diffuseColor = Palettes[currTheme.name][color];
-            }
-        }
-    };
 
     this.loadSkyboxTextureThemes = function() {
         

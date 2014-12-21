@@ -8,22 +8,11 @@
 *
 *********************************************************/
 
-/*Graph Model
-    
-    Babylon Materials and Colors
-    Pointer events; Pick events
-    Mimicing Graph Structure with model objects on screen
-
-    Things to do:
-    create materials
-    set a default color theme for 
-        vertex color
-        edge color
-        active or marked color
-        selected color
-
-*/
-
+/**
+*
+* Graph States that control what mouse events will trigger
+*
+**/
 
 var GraphStates = {
         disabled      : 'disabled',
@@ -38,7 +27,11 @@ var GraphStates = {
         algorithmSSSP : 'short'
 };
 
-
+/**
+*
+* Graph Model Object
+*
+**/
 
 var GraphModel = function (scene, groundName, theme, size) {    
     Graph.call(this);
@@ -72,20 +65,25 @@ var GraphModel = function (scene, groundName, theme, size) {
         vertex : "vertex",
         edge   : "edge"
     };
-
 };
+
+/*========================================================
+=            prototype ihneritance from Graph            =
+========================================================*/
 
 GraphModel.prototype = new Graph();
 GraphModel.constructor = GraphModel;
 GraphModel.prototype.parent = Graph.prototype;
 
+/*-----  End of prototype ihneritance from Graph  ------*/
+
+
+/*============================
+=            init            =
+============================*/
 GraphModel.prototype.initialize = function(count) {
     this._createGraphMaterials();
     this.parent.initialize.call(this, count);
-};
-
-GraphModel.prototype.toggleBillboards = function() {
-    this._bEnableValueBillboards = !this._bEnableValueBillboards;
 };
 
 GraphModel.prototype._createGraphMaterials = function() {
@@ -99,6 +97,12 @@ GraphModel.prototype._createGraphMaterials = function() {
     matActive.diffuseColor   = this._theme.active;
     matSelected.diffuseColor = this._theme.selected;    
 };
+/*-----  End of init  ------*/
+
+
+/*=====================================================
+=            Graph Componets Manipulations            =
+=====================================================*/
 
 GraphModel.prototype.addVertex = function(value, position) {
     this.parent.addVertex.call(this, value);
@@ -112,7 +116,7 @@ GraphModel.prototype.addVertex = function(value, position) {
     mVertex.material = this._scene.getMaterialByID(this._MATERIALIDS.vertex);   
     
     if(typeof(position) == "undefined"){
-        position = this.getCirclePatternPosition(this.parent.getVertexCount.call(this));
+        position = this.getCirclePatternPosition(this._idCount);
     }
 
     mVertex.position = new BABYLON.Vector3(position.x, (this._meshSize * 0.5) + 3, position.y);
@@ -120,6 +124,21 @@ GraphModel.prototype.addVertex = function(value, position) {
 
     BABYLON.Tags.EnableFor(mVertex);
     mVertex.addTags("vertex");
+};
+
+GraphModel.prototype.removeVertexById = function(vertexId) {
+    var name = this.getVertexNameById(vertexId);
+    var vertex = this._scene.getMeshByName(name);
+
+    vertex.dispose();
+    this.parent.removeVertexById.call(this, vertexId);
+};
+
+GraphModel.prototype.removeVertexByName = function(name) {
+    var vertex = this._scene.getMeshByName(name);
+
+    vertex.dispose();
+    this.parent.removeVertexByName.call(this, name);
 };
 
 GraphModel.prototype.addEdge = function(v, w) {
@@ -158,6 +177,28 @@ GraphModel.prototype.addEdgeByMesh = function(mesh_v, mesh_w) {
     //this.addEdgeDetectEvent(edge);
 };
 
+GraphModel.prototype.removeEdgeByValue = function(v, w) {
+    var name = this.parent.getEdgeNameById.call(this,v, w);
+    var edge = this._scene.getMeshByName(name);
+
+    edge.dispose();
+
+    this.parent.removeEdgeByValue.call(this, v, w);
+};
+
+GraphModel.prototype.removeEdgeByName = function(name) {
+    var edge = this._scene.getMeshByName(name);
+    edge.dispose();
+
+    this.parent.removeEdgeByName.call(this,name);
+
+};
+/*-----  End of Graph Componets Manipulations  ------*/
+
+
+/*=======================================
+=            Graph Positioning         =
+=======================================*/
 GraphModel.prototype._positionEdge = function(edge, start, end, distance) {
     
     // First of all we have to set the pivot not in the center of the cylinder:
@@ -180,19 +221,46 @@ GraphModel.prototype._positionEdge = function(edge, start, end, distance) {
     
     // Then using axis rotation the result is obvious
     edge.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, -Math.PI / 2 + angle);
+};
 
+GraphModel.prototype.updateEdges = function() {
+    var edgeList = this._scene.getMeshesByTags("edge");
+
+    for(var index = 0; index < edgeList.length; index++) {
+        var edge = edgeList[index];
+
+        var v = edge.adt.v;
+        var w = edge.adt.w;
+
+        nameV = this.getVertexNameById(v);
+        nameW = this.getVertexNameById(w);
+
+        var vertex_v = this._scene.getMeshByName(nameV);
+        var vertex_w = this._scene.getMeshByName(nameW);
+
+        var distance = BABYLON.Vector3.Distance(vertex_v.position, vertex_w.position);
+        this._positionEdge(edge, vertex_v.position, vertex_w.position, distance);
+
+    }
 };
 
 GraphModel.prototype.organizeModel = function() {
 
-    var vertexList = this.scene.getMeshesByTags("vertex");
+    var vertexList = this._scene.getMeshesByTags("vertex");
 
     for(var vertexCount = 0; vertexCount < vertexList.length; vertexCount++) {
         var coord = this.getCirclePatternPosition(vertexCount);
-        vertexList[vertexCount].position = new BABYLON.Vector3(coord.x, this.meshSize + 5, coord.y);
+        vertexList[vertexCount].position = new BABYLON.Vector3(coord.x, this._meshSize + 5, coord.y);
     }
-};
 
+    this.updateEdges();
+};
+/*-----  End of Graph Positioning-----*/
+
+
+/*========================================
+=            helper methods              =
+========================================*/
 GraphModel.prototype.getCirclePatternPosition = function(nth) {
     var nthcircle = 0;
     var positionInCircle = nth;
@@ -232,7 +300,7 @@ GraphModel.prototype.removeAllEdges = function() {
         edges[index].dispose();
     }
 
-    GraphModel.prototype.removeAllEdges();
+    this.parent.removeAllEdges.call(this);
 };
 
 GraphModel.prototype.clearGraph = function() {
@@ -244,6 +312,17 @@ GraphModel.prototype.clearGraph = function() {
         vertices[index].dispose();
     }
 
+    this.removeAllEdges();
+
     this.parent.clearGraph.call(this);
 };
+
+GraphModel.prototype.toggleBillboards = function() {
+    this._bEnableValueBillboards = !this._bEnableValueBillboards;
+};
+/*-----  End of helper methods     ------*/
+
+
+
+
 

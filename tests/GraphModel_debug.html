@@ -47,8 +47,10 @@
       var scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color3(0.8, 0.8, 0.8);
 
-      var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(10, 10, 10), scene);
-      camera.setTarget(BABYLON.Vector3.Zero());
+      var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 100, 0), scene);
+
+      //camera.position = new BABYLON.Vector3(0, 200, 0);
+      camera.setTarget(new BABYLON.Vector3.Zero());
       camera.attachControl(canvas, false);
 
       var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
@@ -72,6 +74,7 @@
 
       graph.createRandomGraph(140, 55);
       graph.clearAllMarks();
+      graph.toggleVertexLables();
       console.log(graph.printGraph());
 
       console.log(graph);

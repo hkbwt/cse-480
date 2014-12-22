@@ -61,6 +61,8 @@ var GraphModel = function (scene, groundName, theme, size) {
         selected : "selected_mat",
     };
 
+    this._LABELSIZE = 5;
+
     this._MESHTAGS = {
         vertex : "vertex",
         edge   : "edge"
@@ -124,6 +126,8 @@ GraphModel.prototype.addVertex = function(value, position) {
 
     BABYLON.Tags.EnableFor(mVertex);
     mVertex.addTags("vertex");
+
+    this._addVertexLabel(mVertex);
 };
 
 GraphModel.prototype.removeVertexById = function(vertexId) {
@@ -139,6 +143,41 @@ GraphModel.prototype.removeVertexByName = function(name) {
 
     vertex.dispose();
     this.parent.removeVertexByName.call(this, name);
+};
+
+GraphModel.prototype._addVertexLabel = function(vertex_mesh) {
+
+    var label = BABYLON.Mesh.CreatePlane("label_" + vertex_mesh.name, this._LABELSIZE, this._scene, false);
+    var label_mat = new BABYLON.StandardMaterial("label_mat_" + vertex_mesh.name, this._scene);
+    var label_texture = new BABYLON.DynamicTexture("label_texture_" + vertex_mesh.name, 512, this._scene, true );
+    
+    label.material = label_mat;
+    label_texture.hasAlpha = true;
+    label.material.diffuseTexture = label_texture;
+    label.material.emissiveColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+
+    var size = label_texture.getSize();
+    label_texture.drawText(
+                        vertex_mesh.adt.value,                      // text
+                        180,                                        // x coord
+                        size.height / 2 + 30,                       // y coord
+                        "bold 180px Segoe UI",                      // font
+                        "white",                                    // text color
+                        "transparent",                              // clear color
+                        true);                                      // invertY
+
+    label.parent = vertex_mesh;
+    label.position.y += 5.0;
+    label.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+    BABYLON.Tags.EnableFor(label);
+    label.addTags("label_vertex");
+
+    if(!this._bEnableValueBillboards) {
+        label.isVisible = false;
+    }
+
+        
 };
 
 GraphModel.prototype.addEdge = function(v, w) {
@@ -191,8 +230,8 @@ GraphModel.prototype.removeEdgeByName = function(name) {
     edge.dispose();
 
     this.parent.removeEdgeByName.call(this,name);
-
 };
+
 /*-----  End of Graph Componets Manipulations  ------*/
 
 
@@ -317,8 +356,31 @@ GraphModel.prototype.clearGraph = function() {
     this.parent.clearGraph.call(this);
 };
 
-GraphModel.prototype.toggleBillboards = function() {
+GraphModel.prototype.toggleVertexLables = function() {
     this._bEnableValueBillboards = !this._bEnableValueBillboards;
+
+    if(this._bEnableValueBillboards) {
+        this._showVertexLabels();
+    }
+    else {
+        this._hideVertexLabels();
+    }
+};
+
+GraphModel.prototype._showVertexLabels = function() {
+    var labels = this._scene.getMeshesByTags("label_vertex");
+
+    for(var index = 0; index < labels.length; index++) {
+        labels[index].isVisible = true;
+    }
+};
+
+GraphModel.prototype._hideVertexLabels = function() {
+    var labels = this._scene.getMeshesByTags("label_vertex");
+
+    for(var index = 0; index < labels.length; index++) {
+        labels[index].isVisible = false;
+    }
 };
 /*-----  End of helper methods     ------*/
 

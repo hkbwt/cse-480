@@ -1,4 +1,4 @@
-/********************************************************
+/*******************************************************
 *
 *           Date: 9.18.2014
 *           Filename: GraphMdoel.js
@@ -18,12 +18,14 @@ var GraphStates = {
         disabled      : 'disabled',
         dragndrop     : 'dragndrop',
         
-        addEdge       : 'addEdge',
         addVertex     : 'addVertex',
         removeVertex  : 'removeVertex',
+        addEdge       : 'addEdge',
+        removeEdge    : 'removeEdge',
+
         
-        algorithmDFS  : 'dfs',
         algorithmBFS  : 'bfs',
+        algorithmDFS  : 'dfs',
         algorithmSSSP : 'short'
 };
 
@@ -54,15 +56,13 @@ var GraphModel = function (scene, groundName, theme, size) {
     this._distanceBetweenModels  = 3.0;
     this._bEnableValueBillboards = false;
 
+    this._labelSize = 5;
     this._MATERIALIDS = {
         vertex   : "vertex_mat",
         edge     : "edge_mat",
         active   : "active_mat",
         selected : "selected_mat",
     };
-
-    this._LABELSIZE = 5;
-
     this._MESHTAGS = {
         vertex : "vertex",
         edge   : "edge"
@@ -72,11 +72,9 @@ var GraphModel = function (scene, groundName, theme, size) {
 /*========================================================
 =            prototype ihneritance from Graph            =
 ========================================================*/
-
 GraphModel.prototype = new Graph();
 GraphModel.constructor = GraphModel;
 GraphModel.prototype.parent = Graph.prototype;
-
 /*-----  End of prototype ihneritance from Graph  ------*/
 
 
@@ -85,6 +83,7 @@ GraphModel.prototype.parent = Graph.prototype;
 ============================*/
 GraphModel.prototype.initialize = function(count) {
     this._createGraphMaterials();
+    this._initializeDragnDropEvents();
     this.parent.initialize.call(this, count);
 };
 
@@ -99,11 +98,95 @@ GraphModel.prototype._createGraphMaterials = function() {
     matActive.diffuseColor   = this._theme.active;
     matSelected.diffuseColor = this._theme.selected;    
 };
+
+GraphModel.prototype._initializeDragnDropEvents = function() {
+    // Events
+    var canvas = this._scene.getEngine().getRenderingCanvas();
+    var startingPoint;
+    var currentMesh;
+
+    var getGroundPosition = function () {
+        // Use a predicate to get position on the ground
+        var pickResults = this._scene.pick(
+            this._scene.pointerX,
+            this._scene.pointerY,
+            function (mesh) { return mesh.id == this._groundName; }.bind(this));
+
+        if (pickResults.hit) {
+            return pickResults.pickedPoint;
+        }
+
+        return null;
+    }.bind(this);
+
+    var onPointerDown = function (evt) {
+        if (evt.button !== 0 || this._graphState != GraphStates.dragndrop) {
+            return;
+        }
+
+        // check if we are under a mesh
+        var pickInfo = this._scene.pick(
+            this._scene.pointerX,
+            this._scene.pointerY,
+            function (mesh) { 
+                return (mesh.id !== this._groundName && mesh.matchesTagsQuery(this._MESHTAGS.vertex)); 
+            }.bind(this));
+
+
+        if (pickInfo.hit) {
+            currentMesh = pickInfo.pickedMesh;
+            startingPoint = getGroundPosition(evt);
+
+            if (startingPoint) { // we need to disconnect camera from canvas
+                setTimeout(function () {
+                    this._scene.getCameraByName("camera").detachControl(canvas);
+                }.bind(this), 0);
+            }
+        }
+    }.bind(this);
+
+    var onPointerUp = function () {
+        if (startingPoint) {
+            this._scene.getCameraByName("camera").attachControl(canvas, true);
+            startingPoint = null;
+            return;
+        }
+    }.bind(this);
+
+    var onPointerMove = function (evt) {
+        if (!startingPoint) {
+            return;
+        }
+
+        var current = getGroundPosition(evt);
+
+        if (!current) {
+            return;
+        }
+
+        var diff = current.subtract(startingPoint);
+        currentMesh.position.addInPlace(diff);
+        this.updateEdges(this._createAdjEdgeMeshList(currentMesh));
+
+
+        startingPoint = current;
+    }.bind(this);
+
+    canvas.addEventListener("pointerdown", onPointerDown, false);
+    canvas.addEventListener("pointerup", onPointerUp, false);
+    canvas.addEventListener("pointermove", onPointerMove, false);
+
+    this._scene.onDispose = function () {
+        canvas.removeEventListener("pointerdown", onPointerDown);
+        canvas.removeEventListener("pointerup", onPointerUp);
+        canvas.removeEventListener("pointermove", onPointerMove);
+    };
+};
 /*-----  End of init  ------*/
 
 
 /*=====================================================
-=            Graph Componets Manipulations            =
+=            Add/Remove Graph Componets             =
 =====================================================*/
 
 GraphModel.prototype.addVertex = function(value, position) {
@@ -147,7 +230,7 @@ GraphModel.prototype.removeVertexByName = function(name) {
 
 GraphModel.prototype._addVertexLabel = function(vertex_mesh) {
 
-    var label = BABYLON.Mesh.CreatePlane("label_" + vertex_mesh.name, this._LABELSIZE, this._scene, false);
+    var label = BABYLON.Mesh.CreatePlane("label_" + vertex_mesh.name, this._labelSize, this._scene, false);
     var label_mat = new BABYLON.StandardMaterial("label_mat_" + vertex_mesh.name, this._scene);
     var label_texture = new BABYLON.DynamicTexture("label_texture_" + vertex_mesh.name, 512, this._scene, true );
     
@@ -175,9 +258,7 @@ GraphModel.prototype._addVertexLabel = function(vertex_mesh) {
 
     if(!this._bEnableValueBillboards) {
         label.isVisible = false;
-    }
-
-        
+    }     
 };
 
 GraphModel.prototype.addEdge = function(v, w) {
@@ -236,7 +317,7 @@ GraphModel.prototype.removeEdgeByName = function(name) {
 
 
 /*=======================================
-=            Graph Positioning         =
+=            Graph Manipulations       =
 =======================================*/
 GraphModel.prototype._positionEdge = function(edge, start, end, distance) {
     
@@ -260,26 +341,34 @@ GraphModel.prototype._positionEdge = function(edge, start, end, distance) {
     
     // Then using axis rotation the result is obvious
     edge.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, -Math.PI / 2 + angle);
+
+    var vertexData = new BABYLON.VertexData.CreateCylinder(distance,1,1,0,1);
+    vertexData.applyToMesh(edge,true);
 };
 
-GraphModel.prototype.updateEdges = function() {
-    var edgeList = this._scene.getMeshesByTags("edge");
+GraphModel.prototype.updateEdges = function(edgeList) {
+    if(typeof(edgeList) == "undefined") {
+        edgeList = this._scene.getMeshesByTags("edge");   
+    }
+    
+    if(edgeList.length > 0) {
 
-    for(var index = 0; index < edgeList.length; index++) {
-        var edge = edgeList[index];
+        for(var index = 0; index < edgeList.length; index++) {
+            var edge = edgeList[index];
 
-        var v = edge.adt.v;
-        var w = edge.adt.w;
+            var v = edge.adt.v;
+            var w = edge.adt.w;
 
-        nameV = this.getVertexNameById(v);
-        nameW = this.getVertexNameById(w);
+            nameV = this.getVertexNameById(v);
+            nameW = this.getVertexNameById(w);
 
-        var vertex_v = this._scene.getMeshByName(nameV);
-        var vertex_w = this._scene.getMeshByName(nameW);
+            var vertex_v = this._scene.getMeshByName(nameV);
+            var vertex_w = this._scene.getMeshByName(nameW);
 
-        var distance = BABYLON.Vector3.Distance(vertex_v.position, vertex_w.position);
-        this._positionEdge(edge, vertex_v.position, vertex_w.position, distance);
+            var distance = BABYLON.Vector3.Distance(vertex_v.position, vertex_w.position);
+            this._positionEdge(edge, vertex_v.position, vertex_w.position, distance);
 
+        }
     }
 };
 
@@ -294,8 +383,105 @@ GraphModel.prototype.organizeModel = function() {
 
     this.updateEdges();
 };
+
 /*-----  End of Graph Positioning-----*/
 
+
+/*================================
+=            Triggers            =
+================================*/
+GraphModel.prototype._setVertexTriggers = function(vertex) {
+    vertex.actionManager = new BABYLON.ActionManager(this._scene);
+
+    var dragndrop_condition = new BABYLON.ValueCondition(vertex.actionManager,
+                                this,
+                                "_graphState",
+                                "dragndrop",
+                                BABYLON.ValueCondition.IsEqual);
+
+    var moveAction = new BABYLON.ActionManager.ExecuteCodeAction(
+                    BABYLON.ActionManager.OnPickTrigger,
+                    this.moveable.call(this, evt),
+                    dragndrop_condition);
+
+
+    vertex.actionManager.registerAction(moveActionIn );
+};
+
+GraphModel.prototype._setEdgeTriggers = function(edge) {
+};
+
+/*-----  End of Triggers  ------*/
+
+/*======================================
+=            Access Methods            =
+======================================*/
+
+GraphModel.prototype.toggleVertexLables = function() {
+    this._bEnableValueBillboards = !this._bEnableValueBillboards;
+
+    if(this._bEnableValueBillboards) {
+        this._showVertexLabels();
+    }
+    else {
+        this._hideVertexLabels();
+    }
+};
+
+GraphModel.prototype.setGraphState = function(state) {
+    this._graphState = state;
+};
+
+GraphModel.prototype.getGraphState = function() {
+    return this._graphState;
+};
+
+GraphModel.prototype.setLabelSize = function(size) {
+    this._labelSize = size;
+    //update labels
+};
+
+GraphModel.prototype.getLabelSize = function() {
+    return this._labelSize;
+};
+
+Graph.prototype.getVertexMeshByName = function(name){
+    var adt = this.parent.getVertexByName.call(this, name);
+    if(adt === null) {return null;}
+    return this.searchVerticesForId(adt.id);
+};
+
+Graph.prototype.getVertexMeshById = function(vertexId) {
+    var adt = this.parent.getVertexById.call(this, vertexId);
+    if(adt === null) {return null;}
+    return this.searchVerticesForId(adt.id);
+};
+        
+Graph.prototype.getVertexMeshByIndex = function(index) {
+    var adt = this.parent.getVertexByIndex.call(this, index);
+    if(adt === null) {return null;}
+    return this.searchVerticesForId(adt.id);
+};
+
+Graph.prototype.getEdgeMeshByName = function(name) {
+    var adt = this.parent.getEdgeByName.call(this, name);
+    if(adt === null) {return null;}
+    return this.searchEdgesForId(adt.v, adt.w);
+};
+
+Graph.prototype.getEdgeMeshById = function(v, w) {
+    var adt = this.parent.getEdgeById.call(this, v, w);
+    if(adt === null) {return null;}
+    return this.searchEdgesForId(adt.v, adt.w);
+};
+
+Graph.prototype.getEdgeMeshByIndex = function(index) {
+    var adt = this.parent.getEdgeByIndex.call(this, index);
+    if(adt === null) {return null;}
+    return this.searchEdgesForId(adt.v, adt.w);
+};
+
+/*-----  End of Access Methods  ------*/
 
 /*========================================
 =            helper methods              =
@@ -356,17 +542,6 @@ GraphModel.prototype.clearGraph = function() {
     this.parent.clearGraph.call(this);
 };
 
-GraphModel.prototype.toggleVertexLables = function() {
-    this._bEnableValueBillboards = !this._bEnableValueBillboards;
-
-    if(this._bEnableValueBillboards) {
-        this._showVertexLabels();
-    }
-    else {
-        this._hideVertexLabels();
-    }
-};
-
 GraphModel.prototype._showVertexLabels = function() {
     var labels = this._scene.getMeshesByTags("label_vertex");
 
@@ -382,9 +557,49 @@ GraphModel.prototype._hideVertexLabels = function() {
         labels[index].isVisible = false;
     }
 };
+
+Graph.prototype._createAdjEdgeMeshList = function(mVertex) {
+        var updateEdgeList = [];
+        var adt = mVertex.adt;
+
+        for(var index = 0; index < adt.adjVertIdList.length; index++) {
+            var edge = this.getEdgeMeshById(adt.id, adt.adjVertIdList[index]);
+            
+            if(edge !== null) {
+                updateEdgeList.push(edge);
+            }
+            
+        }
+
+        return updateEdgeList;
+};
+
+Graph.prototype.searchEdgesForId = function(v, w) {
+    var edgeList = this._scene.getMeshesByTags("edge");
+    if(edgeList.length < 1) {return null;}
+
+    for(var index = 0; index < edgeList.length; index++) {
+        if(edgeList[index].adt.isEdge(v,w)) {
+            return edgeList[index];
+        }
+    }
+
+    return null;
+};
+
+Graph.prototype.searchVerticesForId = function(id) {
+    var vertexList = this._scene.getMeshesByTags("vertex");
+    if(vertexList.length < 1) {return null;}
+
+    for(var index = 0; index < vertexList.length; index++) {
+        if(vertexList[index].adt.id == id) {
+            return vertexList[index];
+        }
+    }
+
+    return null;
+};
+
 /*-----  End of helper methods     ------*/
-
-
-
 
 

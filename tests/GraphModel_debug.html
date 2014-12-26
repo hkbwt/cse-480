@@ -57,10 +57,10 @@
       light.intensity = 0.5;
 
 
-      var ground = BABYLON.Mesh.CreateGround("ground", 6, 6, 2, scene);
+      var ground = BABYLON.Mesh.CreateGround("ground", 1000, 1000, 2, scene);
 
 
-      var graph = new GraphModel(scene, undefined, undefined);
+      var graph = new GraphModel(scene, "ground");
       graph.initialize(10);
       graph.addEdge(1,3);
       graph.addEdge(3,1);
@@ -76,6 +76,8 @@
       graph.clearAllMarks();
       graph.toggleVertexLables();
       console.log(graph.printGraph());
+
+      graph.setGraphState(GraphStates.dragndrop);
 
       console.log(graph);
       console.log(graph instanceof GraphModel);

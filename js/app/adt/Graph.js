@@ -73,19 +73,26 @@ Graph.prototype.getVertexByIndex = function(index) {
 };
 
 Graph.prototype.getEdgeByName = function(name) {
-	for( var edge in this._edgeList ) {
-		if (edge.name == edge) { return edge; }
+	for( var index = 0; index < this._edgeList.length; index++  ) {
+		if (this._edgeList[index].name == name) { return this._edgeList[index]; }
 	}
 	return null;
 };
 
 Graph.prototype.getEdgeById = function(v, w) {
-	var edge = this.getEdgeByName(this.getEdgeNameById(v,w));
+	var smaller;
+	var larger;
 
-	if(edge === null) {
-		edge = this.getEdgeByName(this.getEdgeNameById(w,v));
+	if(v < w) {
+		smaller = v;
+		larger = w;
+	}
+	else {
+		smaller = w;
+		larger = v;
 	}
 
+	var edge = this.getEdgeByName(this.getEdgeNameById(smaller, larger));
 	return edge;
 };
 
@@ -119,7 +126,7 @@ Graph.prototype.getEdgeNameById = function(vertexIdOne, vertexIdTwo) {
 
 Graph.prototype.getEdgeIdByName = function(name) {
 	var parts = name.split("_");
-	return [{v: parseInt(parts[0])}, {w: parseInt(parts[1])}];
+	return {v: parseInt(parts[0]), w: parseInt(parts[1])};
 };
 
 ////==================================================
@@ -311,7 +318,7 @@ Graph.prototype.createRandomGraph = function(ubVertexNumber, ubEdgeNumber) {
 
 Graph.prototype.clearAllMarks = function() {
 	for(var id = 0; id < this._vertexList.length; id++) {
-		this._vertexList[id].mark = false;
+		this._vertexList[id].marked = false;
 	}
 };
 
